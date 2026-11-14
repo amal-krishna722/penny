@@ -27,6 +27,14 @@ export function longDate(iso: string): string {
   return parseDate(iso).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
 }
 
+/** Whole days from today to `iso`. Negative if it's in the past. */
+export function daysUntil(iso: string): number {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  // Math.round absorbs the 1-hour difference on daylight-saving change days.
+  return Math.round((parseDate(iso).getTime() - today.getTime()) / 86_400_000);
+}
+
 /** "groceries" → "Groceries" */
 export function categoryLabel(category: Category): string {
   return category.charAt(0).toUpperCase() + category.slice(1);

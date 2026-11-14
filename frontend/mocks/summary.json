@@ -1,0 +1,194 @@
+{
+  "start": "2026-10-16",
+  "end": "2026-11-14",
+  "total_spent": 981.84,
+  "card_spent": 951.84,
+  "cash_spent": 30,
+  "receipt_coverage_pct": 16.7,
+  "by_category": [
+    {
+      "category": "shopping",
+      "amount": 474.16,
+      "pct": 48.3
+    },
+    {
+      "category": "groceries",
+      "amount": 286.65,
+      "pct": 29.2
+    },
+    {
+      "category": "dining",
+      "amount": 67.55,
+      "pct": 6.9
+    },
+    {
+      "category": "subscriptions",
+      "amount": 55.46,
+      "pct": 5.6
+    },
+    {
+      "category": "utilities",
+      "amount": 48.6,
+      "pct": 4.9
+    },
+    {
+      "category": "transport",
+      "amount": 32.92,
+      "pct": 3.4
+    },
+    {
+      "category": "entertainment",
+      "amount": 16.5,
+      "pct": 1.7
+    }
+  ],
+  "daily": [
+    {
+      "date": "2026-10-16",
+      "amount": 48.6
+    },
+    {
+      "date": "2026-10-17",
+      "amount": 0
+    },
+    {
+      "date": "2026-10-18",
+      "amount": 6.1
+    },
+    {
+      "date": "2026-10-19",
+      "amount": 0
+    },
+    {
+      "date": "2026-10-20",
+      "amount": 16.5
+    },
+    {
+      "date": "2026-10-21",
+      "amount": 0
+    },
+    {
+      "date": "2026-10-22",
+      "amount": 43.11
+    },
+    {
+      "date": "2026-10-23",
+      "amount": 0
+    },
+    {
+      "date": "2026-10-24",
+      "amount": 27.99
+    },
+    {
+      "date": "2026-10-25",
+      "amount": 0
+    },
+    {
+      "date": "2026-10-26",
+      "amount": 9.75
+    },
+    {
+      "date": "2026-10-27",
+      "amount": 0
+    },
+    {
+      "date": "2026-10-28",
+      "amount": 14.2
+    },
+    {
+      "date": "2026-10-29",
+      "amount": 0
+    },
+    {
+      "date": "2026-10-30",
+      "amount": 61.27
+    },
+    {
+      "date": "2026-10-31",
+      "amount": 0
+    },
+    {
+      "date": "2026-11-01",
+      "amount": 27.98
+    },
+    {
+      "date": "2026-11-02",
+      "amount": 0
+    },
+    {
+      "date": "2026-11-03",
+      "amount": 15.49
+    },
+    {
+      "date": "2026-11-04",
+      "amount": 389.99
+    },
+    {
+      "date": "2026-11-05",
+      "amount": 5.85
+    },
+    {
+      "date": "2026-11-06",
+      "amount": 56.3
+    },
+    {
+      "date": "2026-11-07",
+      "amount": 11.99
+    },
+    {
+      "date": "2026-11-08",
+      "amount": 18
+    },
+    {
+      "date": "2026-11-09",
+      "amount": 32.18
+    },
+    {
+      "date": "2026-11-10",
+      "amount": 18.72
+    },
+    {
+      "date": "2026-11-11",
+      "amount": 0
+    },
+    {
+      "date": "2026-11-12",
+      "amount": 47.85
+    },
+    {
+      "date": "2026-11-13",
+      "amount": 96.12
+    },
+    {
+      "date": "2026-11-14",
+      "amount": 33.85
+    }
+  ],
+  "top_merchants": [
+    {
+      "merchant": "Best Buy",
+      "amount": 389.99,
+      "count": 1
+    },
+    {
+      "merchant": "Amazon",
+      "amount": 112.11,
+      "count": 2
+    },
+    {
+      "merchant": "Stop & Shop",
+      "amount": 109.12,
+      "count": 2
+    },
+    {
+      "merchant": "Big Y",
+      "amount": 99.41,
+      "count": 2
+    },
+    {
+      "merchant": "Eversource Energy",
+      "amount": 48.6,
+      "count": 1
+    }
+  ]
+}

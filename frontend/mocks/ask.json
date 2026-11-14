@@ -1,0 +1,39 @@
+[
+  {
+    "question": "How much did I spend on food this month?",
+    "answer": "You spent $233.97 on food this month: $182.27 on groceries and $51.70 on dining. The groceries total includes $60.12 of food from your Amazon order.",
+    "tools_used": [
+      { "name": "get_spending", "args": { "category": "groceries", "start": "2026-11-01", "end": "2026-11-14" } },
+      { "name": "get_spending", "args": { "category": "dining", "start": "2026-11-01", "end": "2026-11-14" } }
+    ]
+  },
+  {
+    "question": "Where did most of my money go?",
+    "answer": "Shopping was your biggest category at $474.16 (48% of spending), mostly the $389.99 Best Buy purchase. Groceries came second at $286.65.",
+    "tools_used": [
+      { "name": "get_category_breakdown", "args": { "start": "2026-10-16", "end": "2026-11-14" } },
+      { "name": "get_top_merchants", "args": { "n": 3, "start": "2026-10-16", "end": "2026-11-14" } }
+    ]
+  },
+  {
+    "question": "How much cash did I spend?",
+    "answer": "You spent $30.00 in cash over the last 30 days: $12.00 at Taco Truck and $18.00 at Amherst Farmers Market. Your bank never saw either one.",
+    "tools_used": [
+      { "name": "get_cash_vs_card", "args": { "start": "2026-10-16", "end": "2026-11-14" } }
+    ]
+  },
+  {
+    "question": "How much do I pay for subscriptions?",
+    "answer": "You pay $55.46 a month for 4 subscriptions: Planet Fitness ($24.99), Netflix ($15.49), Spotify ($11.99) and iCloud ($2.99).",
+    "tools_used": [
+      { "name": "get_subscriptions", "args": {} }
+    ]
+  },
+  {
+    "question": "When did I last buy coffee?",
+    "answer": "You last bought coffee on November 13: a 2 lb bag of whole bean coffee for $18.49 in your Amazon order.",
+    "tools_used": [
+      { "name": "search_items", "args": { "query": "coffee" } }
+    ]
+  }
+]

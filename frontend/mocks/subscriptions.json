@@ -1,0 +1,9 @@
+{
+  "total_monthly": 55.46,
+  "subscriptions": [
+    { "merchant": "Planet Fitness", "amount": 24.99, "last_charged": "2026-11-01", "next_expected": "2026-12-01", "times_seen": 2 },
+    { "merchant": "Netflix", "amount": 15.49, "last_charged": "2026-11-03", "next_expected": "2026-12-03", "times_seen": 2 },
+    { "merchant": "Spotify", "amount": 11.99, "last_charged": "2026-11-07", "next_expected": "2026-12-07", "times_seen": 2 },
+    { "merchant": "iCloud", "amount": 2.99, "last_charged": "2026-11-01", "next_expected": "2026-12-01", "times_seen": 2 }
+  ]
+}

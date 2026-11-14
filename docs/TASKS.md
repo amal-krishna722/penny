@@ -78,7 +78,7 @@ If what you need isn't ready, keep using fake data and swap later. Don't block.
 You own `backend/app/receipts/`, `backend/app/dashboard/` and `shortcut/`.
 
 ### A1. Gemini extraction (target 12:30 PM)
-- [ ] **File:** `backend/app/receipts/gemini.py`
+- [x] **File:** `backend/app/receipts/gemini.py`
 - **Build:** `extract_receipt(image_bytes, mime_type) -> dict` (signature in SPEC section 5).
   - Use the `google-genai` SDK with a current Flash model and `response_mime_type="application/json"`.
   - The prompt asks for: merchant, date (YYYY-MM-DD), subtotal, tax, tip, total, category, items (name, price, quantity, category). Paste the category list from SPEC section 3 into the prompt and say "use only these".
@@ -87,7 +87,7 @@ You own `backend/app/receipts/`, `backend/app/dashboard/` and `shortcut/`.
 - **Done when:** it returns clean JSON for every test receipt.
 
 ### A2. POST /receipt (target 1:30 PM)
-- [ ] **File:** `backend/app/receipts/router.py`
+- [x] **File:** `backend/app/receipts/router.py`
 - **Build:**
   1. Check the `X-API-Key` header against `API_SECRET` from `app.config`. Wrong → `401`.
   2. Read the uploaded `file`, call `extract_receipt`.
@@ -99,17 +99,17 @@ You own `backend/app/receipts/`, `backend/app/dashboard/` and `shortcut/`.
 - **Done when:** the receipt shows up in MongoDB Atlas and the response matches SPEC.
 
 ### A3. Public URL (target 2:00 PM)
-- [ ] Install ngrok, run `ngrok http 8000`, post the `https://...` URL in the group chat.
+- [x] Install ngrok, run `ngrok http 8000`, post the `https://...` URL in the group chat.
 - **Done when:** a teammate on another network can open `<url>/health`.
 
 ### A4. Transaction feed (target 3:00 PM)
-- [ ] **Files:** `backend/app/dashboard/feed.py`, `backend/app/dashboard/router.py`
+- [x] **Files:** `backend/app/dashboard/feed.py`, `backend/app/dashboard/router.py`
 - **Build:** `GET /transactions` using the table in SPEC section 3 (FeedEntry). Support the `start`, `end`, `category` and `type` filters.
 - **Test:** before Person B's Nessie data exists, insert 2 or 3 fake transactions in MongoDB by hand.
 - **Done when:** a matched pair appears once, cash receipts show `type: "cash"`, newest first.
 
 ### A5. iPhone Shortcut (target 4:00 PM)
-- [ ] **File:** `shortcut/README.md` (write down the steps and the iCloud share link)
+- [x] **File:** `shortcut/README.md` (write down the steps and the iCloud share link)
 - **Build in the Shortcuts app:**
   1. Take Photo
   2. Convert Image → JPEG
@@ -146,13 +146,13 @@ You own `backend/app/bank/`, `backend/app/insights/`, `backend/scripts/`, `backe
 - **Done when:** merged to `main` and A and C have pulled it.
 
 ### B1. Nessie client (target 12:30 PM)
-- [ ] **File:** `backend/app/bank/nessie.py`
+- [x] **File:** `backend/app/bank/nessie.py`
 - **Build:** small functions that each wrap one Nessie API call: create customer, create account, create merchant, create purchase, list purchases for an account, get account. Read the key from `app.config`. **Check paths and field names against the Nessie docs first.**
 - **Test:** call each one from a Python shell.
 - **Done when:** you can create a purchase and read it back.
 
 ### B2. Seed script (target 1:30 PM)
-- [ ] **File:** `backend/scripts/seed_nessie.py`
+- [x] **File:** `backend/scripts/seed_nessie.py`
 - **Build:** creates `Demo Student`, one checking account (about $2,450) and **60 days** of purchases (about 50 to 70):
   - Subscriptions on the same day each month: Netflix $15.49, Spotify $11.99, Planet Fitness $24.99, iCloud $2.99
   - Groceries weekly (Stop & Shop, Big Y), dining (Chipotle, Starbucks, local spots), shopping (Amazon, Target), transport (Uber), one big Best Buy purchase of $389.99
@@ -175,12 +175,12 @@ You own `backend/app/bank/`, `backend/app/insights/`, `backend/scripts/`, `backe
 - **Done when:** running it once gives a full 60 days of data in Nessie.
 
 ### B3. Sync and account (target 2:30 PM)
-- [ ] **File:** `backend/app/bank/router.py`
+- [x] **File:** `backend/app/bank/router.py`
 - **Build:** `sync_from_nessie()` (signature in SPEC section 5), `POST /bank/sync`, `GET /bank/account`. Upsert by `nessie_id` so running sync twice creates no duplicates. At the end, call `match_receipt` for every unmatched receipt.
 - **Done when:** `transactions` in Atlas has every Nessie purchase, and syncing twice doesn't change the count.
 
 ### B4. Real matching (target 4:00 PM)
-- [ ] **Files:** `backend/app/bank/matching.py`, `backend/tests/test_matching.py`
+- [x] **Files:** `backend/app/bank/matching.py`, `backend/tests/test_matching.py`
 - **Build:** replace the stub. No LLM.
   1. **Candidates:** unmatched transactions within ±2 days of the receipt date.
   2. **Amount must pass one:** exact (difference ≤ $0.01), or for `dining` only, transaction between the receipt total and 1.30× the total (tip).

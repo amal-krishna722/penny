@@ -5,6 +5,7 @@ from app.bank import nessie
 from app.bank.matching import match_receipt
 from app.config import NESSIE_ACCOUNT_ID
 from app.db import receipts, transactions
+from app.insights.subscriptions import get_subscriptions
 from app.models import AccountResponse, SyncResponse
 
 router = APIRouter(tags=["bank"])
@@ -56,6 +57,7 @@ def sync_from_nessie() -> dict:
         if match_receipt(r.get("id") or str(r["_id"])):
             matched += 1
 
+    get_subscriptions()  # sets is_subscription on recurring charges, so feed badges are right after every sync
     return {"synced": len(purchases), "new": new, "matched": matched}
 
 

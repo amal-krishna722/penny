@@ -1,18 +1,11 @@
+import { ChevronRight, ReceiptText } from "lucide-react";
+import { Amount } from "@/components/ui";
+import { CATEGORY_STYLES, categoryLabel, money, shortDate } from "@/lib/format";
 import type { Category, FeedEntry } from "@/lib/types";
-import { CATEGORY_STYLES, categoryLabel, money } from "@/lib/format";
 
+/** Category badge: 15% tint of the category color with darker text. */
 export function CategoryChip({ category }: { category: Category }) {
-  return (
-    <span
-      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${CATEGORY_STYLES[category].chip}`}
-    >
-      {categoryLabel(category)}
-    </span>
-  );
-}
-
-function Badge({ children, className }: { children: React.ReactNode; className: string }) {
-  return <span className={`rounded px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${className}`}>{children}</span>;
+  return <span className={`pill ${CATEGORY_STYLES[category].badge}`}>{categoryLabel(category)}</span>;
 }
 
 export default function TransactionRow({
@@ -27,39 +20,51 @@ export default function TransactionRow({
   onToggle: () => void;
 }) {
   const hasItems = entry.items.length > 0;
+  const hasReceipt = entry.receipt_id !== null;
 
   return (
-    <li className={`transition-colors duration-1000 ${fresh ? "bg-emerald-50" : "bg-white"}`}>
+    <li className={`transition-colors duration-1000 ${fresh ? "bg-accent-soft" : "bg-surface"}`}>
       <button
         type="button"
         onClick={onToggle}
         disabled={!hasItems}
         aria-expanded={hasItems ? expanded : undefined}
-        className="flex w-full items-center gap-3 px-4 py-3 text-left enabled:cursor-pointer enabled:hover:bg-neutral-50"
+        className="flex w-full items-center gap-3 px-4 py-3 text-left enabled:cursor-pointer enabled:hover:bg-surface-alt"
       >
         {/* Chevron only for rows with line items; a spacer keeps others aligned */}
-        <span className={`w-3 text-xs text-neutral-400 transition-transform ${expanded ? "rotate-90" : ""}`}>
-          {hasItems ? "▶" : ""}
+        <span className="w-4 text-text-faint">
+          {hasItems && (
+            <ChevronRight size={16} className={`transition-transform ${expanded ? "rotate-90" : ""}`} aria-hidden="true" />
+          )}
         </span>
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="truncate font-medium text-neutral-900">{entry.merchant}</span>
-            {entry.type === "cash" && <Badge className="bg-amber-100 text-amber-800">Cash</Badge>}
-            {entry.receipt_id && <Badge className="bg-emerald-100 text-emerald-800">Itemized</Badge>}
-            {entry.is_subscription && <Badge className="bg-indigo-100 text-indigo-800">Subscription</Badge>}
+            <span className="truncate font-semibold text-text">{entry.merchant}</span>
+            {hasReceipt && (
+              <ReceiptText
+                size={15}
+                className="shrink-0 text-success"
+                aria-label={entry.type === "card" ? "Matched receipt" : "Receipt"}
+              />
+            )}
+            {entry.is_subscription && <span className="pill bg-accent-soft text-accent-ink">Subscription</span>}
           </div>
-          {hasItems && (
-            <p className="mt-0.5 text-xs text-neutral-500">
-              {entry.items.length} {entry.items.length === 1 ? "item" : "items"}
-            </p>
-          )}
+          <p className="mt-0.5 text-xs text-text-muted">
+            {shortDate(entry.date)}
+            {hasItems && ` · ${entry.items.length} ${entry.items.length === 1 ? "item" : "items"}`}
+            {/* A card charge we have no receipt for: nudge the user to scan one */}
+            {entry.type === "card" && !hasReceipt && <span className="text-warning-ink"> · No receipt</span>}
+          </p>
         </div>
 
         <span className="hidden sm:block">
           <CategoryChip category={entry.category} />
         </span>
-        <span className="w-24 text-right font-mono text-sm tabular-nums text-neutral-900">{money(entry.amount)}</span>
+        <span className="pill hidden border border-border text-text-muted sm:inline-flex">
+          {entry.type === "cash" ? "Cash" : "Card"}
+        </span>
+        <Amount value={entry.amount} className="w-24 text-right text-sm font-semibold text-text" />
       </button>
 
       {expanded && hasItems && <LineItems entry={entry} />}
@@ -80,35 +85,36 @@ function LineItems({ entry }: { entry: FeedEntry }) {
   }
 
   return (
-    <div className="border-t border-neutral-100 bg-neutral-50 px-4 py-3 pl-10">
+    <div className="border-t border-border bg-surface-alt px-4 py-3 pl-11">
       {byCategory.size > 1 && (
-        <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-neutral-600">
-          <span className="font-medium">Split:</span>
+        <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-text">
+          <span className="font-semibold">Split:</span>
           {[...byCategory].map(([category, amount]) => (
             <span key={category} className="flex items-center gap-1">
               <CategoryChip category={category} />
-              <span className="font-mono tabular-nums">{money(amount)}</span>
+              <span className="tabular-nums">{money(amount)}</span>
             </span>
           ))}
         </div>
       )}
 
-      <ul className="divide-y divide-neutral-200/70 text-sm">
+      {/* --text here, not --text-muted: muted text is too faint on the beige surface-alt */}
+      <ul className="divide-y divide-border text-sm text-text">
         {entry.items.map((item, i) => (
           <li key={i} className="flex items-center gap-3 py-1.5">
-            <span className="min-w-0 flex-1 truncate text-neutral-800">
+            <span className="min-w-0 flex-1 truncate">
               {item.name}
-              {item.quantity > 1 && <span className="text-neutral-400"> × {item.quantity}</span>}
+              {item.quantity > 1 && <span> × {item.quantity}</span>}
             </span>
             {byCategory.size > 1 && <CategoryChip category={item.category} />}
-            <span className="w-20 text-right font-mono tabular-nums text-neutral-700">{money(item.price)}</span>
+            <span className="w-20 text-right tabular-nums">{money(item.price)}</span>
           </li>
         ))}
         {/* Half a cent of slack so rounding never shows a "$0.00" row */}
         {extra > 0.005 && (
-          <li className="flex items-center gap-3 py-1.5 text-neutral-500">
+          <li className="flex items-center gap-3 py-1.5 italic">
             <span className="flex-1">Tax, tip and fees</span>
-            <span className="w-20 text-right font-mono tabular-nums">{money(extra)}</span>
+            <span className="w-20 text-right tabular-nums">{money(extra)}</span>
           </li>
         )}
       </ul>

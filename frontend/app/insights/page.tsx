@@ -6,8 +6,9 @@
 
 import { useEffect, useState } from "react";
 import PageHeader from "@/components/PageHeader";
+import { Amount, EmptyState, Notice } from "@/components/ui";
 import { getSubscriptions, isMocked } from "@/lib/api";
-import { daysUntil, money, shortDate } from "@/lib/format";
+import { daysUntil, shortDate } from "@/lib/format";
 import type { Subscription, SubscriptionsResponse } from "@/lib/types";
 
 export default function InsightsPage() {
@@ -35,15 +36,11 @@ export default function InsightsPage() {
       <PageHeader title="Insights" subtitle="Recurring charges we found in your bank history" />
 
       {isMocked("subscriptions") && (
-        <p className="mb-4 rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-800">
-          Sample data: the backend isn&apos;t connected for this page yet.
-        </p>
+        <Notice tone="info">Sample data: the backend doesn&apos;t have /subscriptions yet.</Notice>
       )}
 
       {error && (
-        <p className="mb-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-800">
-          Couldn&apos;t load subscriptions ({error}). Check that the backend is running.
-        </p>
+        <Notice tone="error">Couldn&apos;t load subscriptions ({error}). Check that the backend is running.</Notice>
       )}
 
       {data === null ? (
@@ -51,30 +48,31 @@ export default function InsightsPage() {
       ) : (
         <div className="space-y-6">
           {/* Totals strip */}
-          <section className="grid gap-3 sm:grid-cols-3">
+          <section className="grid gap-4 sm:grid-cols-3">
             <StatCard
               label="Subscriptions per month"
-              value={money(data.total_monthly)}
+              value={data.total_monthly}
               note={`${subs.length} active ${subs.length === 1 ? "subscription" : "subscriptions"}`}
-              highlight
             />
-            <StatCard label="Per year" value={money(data.total_monthly * 12)} note="if nothing changes" />
+            <StatCard label="Per year" value={data.total_monthly * 12} note="if nothing changes" />
             <StatCard
               label="Next charge"
-              value={next ? money(next.amount) : "—"}
+              value={next ? next.amount : null}
               note={next ? `${next.merchant}, ${renewsIn(next.next_expected)}` : "Nothing upcoming"}
             />
           </section>
 
           {/* One card per subscription */}
           <section>
-            <h2 className="mb-3 text-sm font-semibold text-neutral-900">Subscriptions</h2>
+            <h2 className="mb-3 text-lg">Subscriptions</h2>
             {subs.length === 0 ? (
-              <p className="rounded-lg border border-dashed border-neutral-300 bg-white py-12 text-center text-sm text-neutral-500">
-                No recurring charges found yet. We need to see the same charge at least twice, about a month apart.
-              </p>
+              <div className="card">
+                <EmptyState title="No recurring charges found yet.">
+                  We need to see the same charge at least twice, about a month apart.
+                </EmptyState>
+              </div>
             ) : (
-              <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {subs.map((s) => (
                   <SubscriptionCard key={s.merchant} sub={s} totalMonthly={data.total_monthly} />
                 ))}
@@ -93,36 +91,36 @@ function SubscriptionCard({ sub, totalMonthly }: { sub: Subscription; totalMonth
   const days = daysUntil(sub.next_expected);
 
   return (
-    <li className="flex flex-col rounded-lg border border-neutral-200 bg-white p-4">
+    <li className="card flex flex-col p-5">
       <div className="flex items-start gap-3">
         {/* Letter avatar: no logos needed */}
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-indigo-50 text-sm font-semibold text-indigo-700">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-soft text-sm font-semibold text-accent-ink">
           {sub.merchant.charAt(0).toUpperCase()}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="truncate font-medium text-neutral-900">{sub.merchant}</p>
-          <p className="text-xs text-neutral-500">
+          <p className="truncate font-semibold text-text">{sub.merchant}</p>
+          <p className="text-xs text-text-muted">
             Seen {sub.times_seen} {sub.times_seen === 1 ? "time" : "times"}
           </p>
         </div>
         <p className="text-right">
-          <span className="font-mono text-lg font-semibold tabular-nums text-neutral-900">{money(sub.amount)}</span>
-          <span className="block text-xs text-neutral-500">/ month</span>
+          <Amount value={sub.amount} className="text-lg font-semibold text-text" />
+          <span className="block text-xs text-text-muted">/ month</span>
         </p>
       </div>
 
-      <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-neutral-100" title={`${share.toFixed(0)}% of monthly total`}>
-        <div className="h-full bg-indigo-500" style={{ width: `${Math.min(100, share)}%` }} />
+      <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-surface-alt" title={`${share.toFixed(0)}% of monthly total`}>
+        <div className="h-full rounded-full bg-accent" style={{ width: `${Math.min(100, share)}%` }} />
       </div>
 
       <dl className="mt-3 flex justify-between text-xs">
         <div>
-          <dt className="text-neutral-500">Last charged</dt>
-          <dd className="font-medium text-neutral-900">{shortDate(sub.last_charged)}</dd>
+          <dt className="text-text-muted">Last charged</dt>
+          <dd className="font-semibold text-text">{shortDate(sub.last_charged)}</dd>
         </div>
         <div className="text-right">
-          <dt className="text-neutral-500">Next expected</dt>
-          <dd className={days >= 0 && days <= 3 ? "font-medium text-amber-700" : "font-medium text-neutral-900"}>
+          <dt className="text-text-muted">Next expected</dt>
+          <dd className={days >= 0 && days <= 3 ? "font-semibold text-warning-ink" : "font-semibold text-text"}>
             {shortDate(sub.next_expected)} · {renewsIn(sub.next_expected)}
           </dd>
         </div>
@@ -144,28 +142,18 @@ function StatCard({
   label,
   value,
   note,
-  highlight = false,
 }: {
   label: string;
-  value: string;
+  value: number | null; // null shows a dash
   note?: string;
-  highlight?: boolean; // dark card for the main number
 }) {
   return (
-    <div
-      className={
-        highlight
-          ? "rounded-lg bg-neutral-900 p-4 text-white"
-          : "rounded-lg border border-neutral-200 bg-white p-4"
-      }
-    >
-      <p className={`text-xs font-medium uppercase tracking-wide ${highlight ? "text-neutral-400" : "text-neutral-500"}`}>
-        {label}
+    <div className="card p-5">
+      <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">{label}</p>
+      <p className="mt-2 text-3xl font-semibold">
+        {value === null ? <span className="text-text-muted">—</span> : <Amount value={value} big />}
       </p>
-      <p className={`mt-1 font-mono text-2xl font-semibold tabular-nums ${highlight ? "text-white" : "text-neutral-900"}`}>
-        {value}
-      </p>
-      {note && <p className={`mt-0.5 truncate text-xs ${highlight ? "text-neutral-400" : "text-neutral-500"}`}>{note}</p>}
+      {note && <p className="mt-1 truncate text-xs text-text-muted">{note}</p>}
     </div>
   );
 }
@@ -173,14 +161,14 @@ function StatCard({
 function Skeleton() {
   return (
     <div className="space-y-6" aria-busy="true">
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-3">
         {Array.from({ length: 3 }, (_, i) => (
-          <div key={i} className="h-24 animate-pulse rounded-lg bg-neutral-100" />
+          <div key={i} className="skeleton h-28" />
         ))}
       </div>
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {Array.from({ length: 4 }, (_, i) => (
-          <div key={i} className="h-36 animate-pulse rounded-lg bg-neutral-100" />
+          <div key={i} className="skeleton h-40" />
         ))}
       </div>
     </div>

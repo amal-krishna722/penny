@@ -4,6 +4,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import PageHeader from "@/components/PageHeader";
+import { EmptyState, Notice } from "@/components/ui";
 import TransactionRow from "@/components/TransactionRow";
 import { getTransactions } from "@/lib/api";
 import { categoryLabel, longDate, money } from "@/lib/format";
@@ -98,7 +99,7 @@ export default function TransactionsPage() {
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value as Category | "")}
-          className="rounded-md border border-neutral-300 bg-white px-3 py-1.5 text-sm text-neutral-800"
+          className="field py-1.5"
           aria-label="Filter by category"
         >
           <option value="">All categories</option>
@@ -109,15 +110,15 @@ export default function TransactionsPage() {
           ))}
         </select>
 
-        <div className="inline-flex rounded-md border border-neutral-300 bg-white p-0.5 text-sm" role="group" aria-label="Filter by payment type">
+        <div className="inline-flex rounded-[10px] border border-border bg-surface-alt p-0.5 text-sm" role="group" aria-label="Filter by payment type">
           {(["", "card", "cash"] as const).map((t) => (
             <button
               key={t}
               type="button"
               onClick={() => setType(t)}
               aria-pressed={type === t}
-              className={`rounded px-3 py-1 font-medium ${
-                type === t ? "bg-neutral-900 text-white" : "text-neutral-600 hover:text-neutral-900"
+              className={`rounded-lg px-3 py-1 font-medium ${
+                type === t ? "bg-primary text-on-primary" : "text-text-muted hover:text-text"
               }`}
             >
               {t === "" ? "All" : t === "card" ? "Card" : "Cash"}
@@ -128,23 +129,25 @@ export default function TransactionsPage() {
 
       {/* An error after data loaded: keep showing the old rows with a warning */}
       {error && rows && (
-        <p className="mb-3 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800">
-          Couldn&apos;t refresh ({error}). Showing the last data we got.
-        </p>
+        <Notice tone="error">Couldn&apos;t refresh ({error}). Showing the last data we got.</Notice>
       )}
 
       {rows === null ? (
         error ? <LoadError message={error} /> : <Skeleton />
       ) : rows.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-neutral-300 bg-white px-4 py-10 text-center text-sm text-neutral-500">
-          No transactions match these filters.
-        </p>
+        <div className="card">
+          {category || type ? (
+            <EmptyState title="Nothing matches these filters.">Try another category, or show both card and cash.</EmptyState>
+          ) : (
+            <EmptyState title="No purchases yet.">Snap a receipt with the Shortcut, or drop one on the Upload page.</EmptyState>
+          )}
+        </div>
       ) : (
         <div className="space-y-6">
           {groupByDate(rows).map(([date, dayRows]) => (
             <section key={date}>
-              <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">{longDate(date)}</h2>
-              <ul className="divide-y divide-neutral-100 overflow-hidden rounded-lg border border-neutral-200 bg-white">
+              <h2 className="mb-2 text-sm text-text-muted">{longDate(date)}</h2>
+              <ul className="card divide-y divide-border overflow-hidden">
                 {dayRows.map((entry) => (
                   <TransactionRow
                     key={entry.id}
@@ -176,8 +179,8 @@ function groupByDate(rows: FeedEntry[]): [string, FeedEntry[]][] {
 
 function LiveDot({ error }: { error: boolean }) {
   return (
-    <span className="flex items-center gap-2 text-xs text-neutral-500">
-      <span className={`h-2 w-2 rounded-full ${error ? "bg-amber-500" : "animate-pulse bg-emerald-500"}`} />
+    <span className="flex items-center gap-2 text-xs text-text-muted">
+      <span className={`h-2 w-2 rounded-full ${error ? "bg-warning" : "animate-pulse bg-success"}`} />
       {error ? "Reconnecting" : "Live"}
     </span>
   );
@@ -185,11 +188,11 @@ function LiveDot({ error }: { error: boolean }) {
 
 function Skeleton() {
   return (
-    <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 bg-white" aria-busy="true">
+    <ul className="card divide-y divide-border" aria-busy="true">
       {Array.from({ length: 6 }, (_, i) => (
         <li key={i} className="flex items-center gap-4 px-4 py-4">
-          <div className="h-4 flex-1 animate-pulse rounded bg-neutral-100" />
-          <div className="h-4 w-16 animate-pulse rounded bg-neutral-100" />
+          <div className="skeleton h-4 flex-1 rounded" />
+          <div className="skeleton h-4 w-16 rounded" />
         </li>
       ))}
     </ul>
@@ -198,10 +201,10 @@ function Skeleton() {
 
 function LoadError({ message }: { message: string }) {
   return (
-    <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-4 text-sm text-red-800">
-      <p className="font-medium">Couldn&apos;t load transactions.</p>
+    <div role="alert" className="rounded-[14px] border border-danger/30 bg-danger/10 px-4 py-4 text-sm text-danger">
+      <p className="font-semibold">Couldn&apos;t load transactions.</p>
       <p className="mt-1">{message}</p>
-      <p className="mt-2 text-red-700">
+      <p className="mt-2">
         Check that the backend is running and that NEXT_PUBLIC_API_URL in .env.local points at it.
       </p>
     </div>

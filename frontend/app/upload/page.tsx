@@ -5,10 +5,12 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { Coin } from "@/components/Logo";
 import PageHeader from "@/components/PageHeader";
+import { Amount, Notice } from "@/components/ui";
 import { CategoryChip } from "@/components/TransactionRow";
 import { isMocked, uploadReceipt } from "@/lib/api";
-import { longDate, money } from "@/lib/format";
+import { longDate } from "@/lib/format";
 import type { ReceiptResponse } from "@/lib/types";
 
 // SPEC section 4: the backend accepts JPEG or PNG.
@@ -77,7 +79,7 @@ export default function UploadPage() {
 
   return (
     <>
-      <PageHeader title="Upload" subtitle="Drop a receipt photo to itemize it" />
+      <PageHeader title="Upload" subtitle="Every cent, itemized. Drop a receipt photo to start." />
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Left: the drop zone, which turns into the image preview */}
@@ -106,10 +108,8 @@ export default function UploadPage() {
           tabIndex={0}
           aria-label="Choose a receipt image"
           aria-disabled={busy}
-          className={`relative flex min-h-80 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed p-6 text-center transition-colors ${
-            dragging
-              ? "border-emerald-500 bg-emerald-50"
-              : "border-neutral-300 bg-white hover:border-neutral-400 hover:bg-neutral-50"
+          className={`relative flex min-h-80 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-[14px] border-2 border-dashed p-6 text-center transition-colors ${
+            dragging ? "border-accent bg-accent-soft" : "border-border bg-surface hover:border-accent hover:bg-surface-alt"
           } ${busy ? "cursor-wait" : ""}`}
         >
           <input
@@ -125,21 +125,22 @@ export default function UploadPage() {
             <img
               src={previewUrl}
               alt="Receipt preview"
-              className={`max-h-96 rounded-md object-contain shadow-sm ${busy ? "opacity-50" : ""}`}
+              className={`max-h-96 rounded-[10px] object-contain shadow-sm ${busy ? "opacity-40" : ""}`}
             />
           ) : (
             <>
-              <ReceiptIcon />
-              <p className="mt-4 font-medium text-neutral-900">Drop a receipt here</p>
-              <p className="mt-1 text-sm text-neutral-500">or click to choose a file, or paste a screenshot</p>
-              <p className="mt-3 text-xs text-neutral-400">JPEG or PNG</p>
+              <Coin size={52} className="opacity-40" />
+              <p className="mt-4 font-semibold text-text">Drop a receipt here</p>
+              <p className="mt-1 text-sm text-text-muted">or click to choose a file, or paste a screenshot</p>
+              <p className="mt-3 text-xs text-text-muted">JPEG or PNG</p>
             </>
           )}
 
           {busy && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-white/60">
-              <span className="h-8 w-8 animate-spin rounded-full border-4 border-neutral-200 border-t-emerald-600" />
-              <p className="text-sm font-medium text-neutral-700">Reading receipt with Gemini…</p>
+            // A pulsing coin instead of a spinner
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-surface/70">
+              <Coin size={44} className="animate-pulse" />
+              <p className="text-sm font-semibold text-text">Reading receipt with Gemini…</p>
             </div>
           )}
         </div>
@@ -147,8 +148,8 @@ export default function UploadPage() {
         {/* Right: what came back */}
         <div>
           {status.kind === "idle" && (
-            <div className="rounded-xl border border-neutral-200 bg-white p-6 text-sm text-neutral-500">
-              <p className="font-medium text-neutral-700">What happens next</p>
+            <div className="card p-6 text-sm text-text-muted">
+              <h2 className="text-lg text-text">What happens next</h2>
               <ol className="mt-3 list-decimal space-y-1.5 pl-5">
                 <li>Gemini reads the merchant, date, total and every line item.</li>
                 <li>We look for the matching charge in your bank account.</li>
@@ -160,13 +161,13 @@ export default function UploadPage() {
           {status.kind === "uploading" && <ResultSkeleton />}
 
           {status.kind === "error" && (
-            <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-800">
-              <p className="font-medium">Upload failed</p>
+            <div role="alert" className="rounded-[14px] border border-danger/30 bg-danger/10 p-5 text-sm text-danger">
+              <p className="font-semibold">Upload failed</p>
               <p className="mt-1">{status.message}</p>
               <button
                 type="button"
                 onClick={file ? () => handleFile(file) : reset}
-                className="mt-4 rounded-md bg-red-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-800"
+                className="btn-primary mt-4"
               >
                 {file ? "Try again" : "Choose another file"}
               </button>
@@ -196,31 +197,27 @@ function ResultCard({ result, onReset }: { result: ReceiptResponse; onReset: () 
   return (
     <div className="space-y-4">
       {/* The same one-line summary the Shortcut shows as a notification */}
-      <div className="rounded-xl bg-emerald-50 px-5 py-4 text-emerald-900 ring-1 ring-emerald-600/20">
-        <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Itemized</p>
-        {/* While mocks are on, every upload returns the same fake receipt. Say so. */}
-        {isMocked("receipt") && (
-          <p className="mt-1 text-xs text-amber-700">
-            Sample data: the backend isn&apos;t connected yet, so this isn&apos;t your receipt.
-          </p>
-        )}
+      {/* While mocks are on, every upload returns the same fake receipt. Say so. */}
+      {isMocked("receipt") && (
+        <Notice tone="info">Sample data: the backend isn&apos;t connected yet, so this isn&apos;t your receipt.</Notice>
+      )}
+      <div className="rounded-[14px] border border-success/30 bg-success/10 px-5 py-4 text-text">
+        <p className="text-xs font-semibold uppercase tracking-wide text-success-ink">Itemized</p>
         <p className="mt-1 font-medium">{result.summary}</p>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white">
-        <div className="flex items-start justify-between gap-4 border-b border-neutral-100 px-5 py-4">
+      <div className="card overflow-hidden">
+        <div className="flex items-start justify-between gap-4 border-b border-border px-5 py-4">
           <div className="min-w-0">
-            <p className="truncate text-lg font-semibold text-neutral-900">{r.merchant}</p>
-            <p className="text-sm text-neutral-500">{longDate(r.date)}</p>
+            <h2 className="truncate text-xl text-text">{r.merchant}</h2>
+            <p className="text-sm text-text-muted">{longDate(r.date)}</p>
           </div>
           <div className="flex flex-col items-end gap-1.5">
             <CategoryChip category={r.category} />
             {r.is_cash ? (
-              <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-amber-800">
-                Cash
-              </span>
+              <span className="pill border border-border text-text-muted">Cash</span>
             ) : (
-              <span className="rounded bg-sky-100 px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-sky-800">
+              <span className="pill bg-success/15 text-success-ink">
                 Matched to card
                 {r.match_confidence !== null && ` · ${Math.round(r.match_confidence * 100)}%`}
               </span>
@@ -228,26 +225,28 @@ function ResultCard({ result, onReset }: { result: ReceiptResponse; onReset: () 
           </div>
         </div>
 
-        <ul className="divide-y divide-neutral-100 px-5 text-sm">
+        <ul className="divide-y divide-border px-5 text-sm">
           {r.items.map((item, i) => (
             <li key={i} className="flex items-center gap-3 py-2">
-              <span className="min-w-0 flex-1 truncate text-neutral-800">
+              <span className="min-w-0 flex-1 truncate text-text">
                 {item.name}
-                {item.quantity > 1 && <span className="text-neutral-400"> × {item.quantity}</span>}
+                {item.quantity > 1 && <span className="text-text-muted"> × {item.quantity}</span>}
               </span>
               <CategoryChip category={item.category} />
-              <span className="w-20 text-right font-mono tabular-nums text-neutral-700">{money(item.price)}</span>
+              <Amount value={item.price} className="w-20 text-right text-text" />
             </li>
           ))}
         </ul>
 
-        <dl className="space-y-1 border-t border-neutral-100 bg-neutral-50 px-5 py-3 text-sm">
+        <dl className="space-y-1 border-t border-border bg-surface-alt px-5 py-3 text-sm">
           <Line label="Subtotal" value={r.subtotal} />
           <Line label="Tax" value={r.tax} />
           <Line label="Tip" value={r.tip} />
-          <div className="flex justify-between pt-1 font-semibold text-neutral-900">
+          <div className="flex justify-between pt-1 font-semibold text-text">
             <dt>Total</dt>
-            <dd className="font-mono tabular-nums">{money(r.total)}</dd>
+            <dd>
+              <Amount value={r.total} />
+            </dd>
           </div>
         </dl>
       </div>
@@ -256,13 +255,13 @@ function ResultCard({ result, onReset }: { result: ReceiptResponse; onReset: () 
         <button
           type="button"
           onClick={onReset}
-          className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"
+          className="btn-primary"
         >
           Upload another
         </button>
         <Link
           href="/transactions"
-          className="rounded-md border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+          className="btn-secondary"
         >
           See it in Transactions →
         </Link>
@@ -275,30 +274,23 @@ function ResultCard({ result, onReset }: { result: ReceiptResponse; onReset: () 
 function Line({ label, value }: { label: string; value: number | null }) {
   if (value === null) return null;
   return (
-    <div className="flex justify-between text-neutral-600">
+    <div className="flex justify-between text-text">
       <dt>{label}</dt>
-      <dd className="font-mono tabular-nums">{money(value)}</dd>
+      <dd>
+        <Amount value={value} />
+      </dd>
     </div>
   );
 }
 
 function ResultSkeleton() {
   return (
-    <div className="space-y-3 rounded-xl border border-neutral-200 bg-white p-5" aria-busy="true">
-      <div className="h-5 w-1/2 animate-pulse rounded bg-neutral-100" />
-      <div className="h-4 w-1/3 animate-pulse rounded bg-neutral-100" />
+    <div className="card space-y-3 p-5" aria-busy="true">
+      <div className="skeleton h-5 w-1/2 rounded" />
+      <div className="skeleton h-4 w-1/3 rounded" />
       {Array.from({ length: 4 }, (_, i) => (
-        <div key={i} className="h-4 animate-pulse rounded bg-neutral-100" />
+        <div key={i} className="skeleton h-4 rounded" />
       ))}
     </div>
-  );
-}
-
-function ReceiptIcon() {
-  return (
-    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-neutral-400" aria-hidden="true">
-      <path d="M6 2h12v20l-3-2-3 2-3-2-3 2V2z" strokeLinejoin="round" />
-      <path d="M9 7h6M9 11h6M9 15h4" strokeLinecap="round" />
-    </svg>
   );
 }

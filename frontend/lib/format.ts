@@ -40,19 +40,21 @@ export function categoryLabel(category: Category): string {
   return category.charAt(0).toUpperCase() + category.slice(1);
 }
 
-// One color per category. `chip` is Tailwind classes for badges, `hex` is for
-// Recharts and the Overview avatars (soft pastels to match the dashboard look) (charts need real color values, not class names).
+// One color per category, from the --cat-* tokens in app/globals.css.
+// `badge` is Tailwind classes (15% tint background, darker "ink" text so it
+// passes contrast). `color` is for Recharts and dots, which need a CSS color
+// value rather than a class name.
 // Class names are written out in full because Tailwind only generates
 // classes it can find as complete strings in the source code.
-export const CATEGORY_STYLES: Record<Category, { chip: string; hex: string }> = {
-  groceries: { chip: "bg-emerald-50 text-emerald-700 ring-emerald-600/20", hex: "#a9b89a" },
-  dining: { chip: "bg-orange-50 text-orange-700 ring-orange-600/20", hex: "#e9a27f" },
-  transport: { chip: "bg-sky-50 text-sky-700 ring-sky-600/20", hex: "#8fc1d9" },
-  shopping: { chip: "bg-violet-50 text-violet-700 ring-violet-600/20", hex: "#a9a7f5" },
-  entertainment: { chip: "bg-pink-50 text-pink-700 ring-pink-600/20", hex: "#e8a1b8" },
-  subscriptions: { chip: "bg-indigo-50 text-indigo-700 ring-indigo-600/20", hex: "#4a4a4a" },
-  utilities: { chip: "bg-amber-50 text-amber-700 ring-amber-600/20", hex: "#f2cf6f" },
-  health: { chip: "bg-rose-50 text-rose-700 ring-rose-600/20", hex: "#d98880" },
-  education: { chip: "bg-teal-50 text-teal-700 ring-teal-600/20", hex: "#86c2b4" },
-  other: { chip: "bg-neutral-100 text-neutral-700 ring-neutral-500/20", hex: "#c9c3b5" },
+export const CATEGORY_STYLES: Record<Category, { badge: string; color: string }> = {
+  groceries: { badge: "bg-cat-groceries/15 text-cat-groceries-ink", color: "var(--cat-groceries)" },
+  dining: { badge: "bg-cat-dining/15 text-cat-dining-ink", color: "var(--cat-dining)" },
+  transport: { badge: "bg-cat-transport/15 text-cat-transport-ink", color: "var(--cat-transport)" },
+  shopping: { badge: "bg-cat-shopping/15 text-cat-shopping-ink", color: "var(--cat-shopping)" },
+  entertainment: { badge: "bg-cat-entertainment/15 text-cat-entertainment-ink", color: "var(--cat-entertainment)" },
+  subscriptions: { badge: "bg-cat-subscriptions/15 text-cat-subscriptions-ink", color: "var(--cat-subscriptions)" },
+  utilities: { badge: "bg-cat-utilities/15 text-cat-utilities-ink", color: "var(--cat-utilities)" },
+  health: { badge: "bg-cat-health/15 text-cat-health-ink", color: "var(--cat-health)" },
+  education: { badge: "bg-cat-education/15 text-cat-education-ink", color: "var(--cat-education)" },
+  other: { badge: "bg-cat-other/15 text-cat-other-ink", color: "var(--cat-other)" },
 };

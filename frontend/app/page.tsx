@@ -6,10 +6,12 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Coin } from "@/components/Logo";
 import PageHeader from "@/components/PageHeader";
-import { CategoryDonut, DailyBars, Sparkline } from "@/components/OverviewCharts";
+import { CategoryDonut, CoverageRing, DailyBars, Sparkline } from "@/components/OverviewCharts";
+import { Amount, EmptyState, Notice } from "@/components/ui";
 import { getAccount, getSummary, getTransactions, isMocked } from "@/lib/api";
-import { CATEGORY_STYLES, categoryLabel, money, shortDate } from "@/lib/format";
+import { CATEGORY_STYLES, categoryLabel, shortDate } from "@/lib/format";
 import type { Account, FeedEntry, Summary } from "@/lib/types";
 
 const POLL_MS = 5000;
@@ -60,23 +62,26 @@ export default function OverviewPage() {
       ) : (
         // Two columns on wide screens: the main dashboard, and a side panel on the right
         <div className="grid grid-cols-1 gap-8 xl:grid-cols-[minmax(0,1fr)_340px]">
-          <div className="min-w-0 space-y-10">
+          <div className="min-w-0 space-y-8">
             <div>
               <PageHeader title="Overview" subtitle={subtitle} />
               <Notices mocked={mocked} error={error} />
               <StatCards summary={summary} account={account} />
             </div>
 
-            <section>
+            <section className="card p-5 sm:p-6">
               <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
                 <div>
-                  <h2 className="text-lg font-semibold">Daily spending</h2>
-                  <p className="mt-1 text-3xl font-bold tabular-nums">
-                    {money(summary.daily.length ? summary.total_spent / summary.daily.length : 0)}
-                    <span className="ml-2 text-sm font-medium text-muted">average per day</span>
+                  <h2 className="text-lg">Daily spending</h2>
+                  <p className="mt-1 text-sm text-text-muted">
+                    <Amount
+                      value={summary.daily.length ? summary.total_spent / summary.daily.length : 0}
+                      className="font-semibold text-text"
+                    />{" "}
+                    average per day
                   </p>
                 </div>
-                <Link href="/transactions" className="text-sm text-muted hover:text-foreground">
+                <Link href="/transactions" className="link text-sm">
                   See all transactions
                 </Link>
               </div>
@@ -94,7 +99,7 @@ export default function OverviewPage() {
 }
 
 // ---------------------------------------------------------------------------
-// Pastel stat cards
+// Stat cards
 // ---------------------------------------------------------------------------
 
 function StatCards({ summary, account }: { summary: Summary; account: Account | null }) {
@@ -105,126 +110,89 @@ function StatCards({ summary, account }: { summary: Summary; account: Account | 
     return sum + d.amount;
   }, 0);
 
+  const total = summary.card_spent + summary.cash_spent;
+  const cardPct = total > 0 ? (summary.card_spent / total) * 100 : 0;
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <PastelCard
-        className="bg-sage"
-        chipClass="bg-sage-deep"
-        icon="$"
-        label="Total spent"
-        chip="30 days"
-        value={money(summary.total_spent)}
-      >
-        <Sparkline values={cumulative} color="#7f9270" />
-      </PastelCard>
+      <div className="card flex flex-col p-5">
+        <StatLabel>Total spent</StatLabel>
+        <Amount value={summary.total_spent} big className="mt-2 text-3xl font-semibold" />
+        <div className="mt-auto pt-2">
+          <Sparkline values={cumulative} />
+        </div>
+      </div>
 
-      <PastelCard
-        className="bg-butter"
-        chipClass="bg-butter-deep"
-        icon="▤"
-        label="Balance"
-        chip="Checking"
-        value={account ? money(account.balance) : "—"}
-      >
-        <SplitBar card={summary.card_spent} cash={summary.cash_spent} />
-      </PastelCard>
+      <div className="card flex flex-col p-5">
+        <StatLabel>Balance</StatLabel>
+        {account ? (
+          <Amount value={account.balance} big className="mt-2 text-3xl font-semibold" />
+        ) : (
+          <span className="mt-2 text-3xl font-semibold text-text-muted">—</span>
+        )}
+        <p className="mt-1 text-xs text-text-muted">{account?.nickname ?? "Checking"}</p>
+        {/* Card vs cash split: cocoa for card, copper for cash */}
+        <div className="mt-auto pt-4">
+          <div className="flex h-2 overflow-hidden rounded-full bg-accent" title={`${cardPct.toFixed(0)}% card`}>
+            <div className="bg-primary" style={{ width: `${cardPct}%` }} />
+          </div>
+          <div className="mt-2 flex justify-between text-xs text-text-muted">
+            <span>
+              Card <Amount value={summary.card_spent} className="font-semibold text-text" />
+            </span>
+            <span>
+              Cash <Amount value={summary.cash_spent} className="font-semibold text-text" />
+            </span>
+          </div>
+        </div>
+      </div>
 
-      {/* Lavender card: receipt coverage, with a shortcut to upload one */}
-      <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-3xl bg-lavender p-5 text-center text-white">
-        {/* Decorative soft circle in the corner, like the reference design */}
-        <span className="absolute -right-10 -bottom-10 h-32 w-32 rounded-full bg-white/10" />
-        <p className="text-3xl font-bold tabular-nums">{summary.receipt_coverage_pct.toFixed(0)}%</p>
-        <p className="mt-1 text-sm text-white/85">of purchases itemized</p>
-        <Link
-          href="/upload"
-          className="relative mt-4 rounded-xl bg-lavender-deep px-5 py-2 text-sm font-semibold transition-colors hover:bg-[#6f6cd9]"
-        >
-          Scan a receipt
-        </Link>
+      <div className="card flex items-center gap-4 p-5">
+        <CoverageRing pct={summary.receipt_coverage_pct} />
+        <div className="min-w-0">
+          <StatLabel>Receipt coverage</StatLabel>
+          <p className="mt-1 text-sm text-text-muted">of purchases itemized</p>
+          <Link href="/upload" className="btn-primary mt-3 px-3 py-1.5 text-xs">
+            Scan a receipt
+          </Link>
+        </div>
       </div>
     </div>
   );
 }
 
-function PastelCard({
-  className,
-  chipClass,
-  icon,
-  label,
-  chip,
-  value,
-  children,
-}: {
-  className: string; // background color class
-  chipClass: string; // darker shade for the icon and chip
-  icon: string;
-  label: string;
-  chip: string;
-  value: string;
-  children?: React.ReactNode;
-}) {
-  return (
-    <div className={`flex flex-col rounded-3xl p-5 ${className}`}>
-      <div className="flex items-center justify-between gap-2">
-        <span className="flex items-center gap-2 whitespace-nowrap text-sm font-semibold">
-          <span className={`flex h-6 w-6 items-center justify-center rounded-md text-xs text-white ${chipClass}`}>{icon}</span>
-          {label}
-        </span>
-        <span className={`whitespace-nowrap rounded-lg px-2 py-1 text-xs font-medium text-white ${chipClass}`}>{chip}</span>
-      </div>
-      <p className="mt-3 text-[1.75rem] font-bold tracking-tight tabular-nums">{value}</p>
-      {children && <div className="mt-auto pt-2">{children}</div>}
-    </div>
-  );
-}
-
-// Card vs cash as one bar, with labels underneath.
-function SplitBar({ card, cash }: { card: number; cash: number }) {
-  const total = card + cash;
-  const cardPct = total > 0 ? (card / total) * 100 : 0;
-  return (
-    <div className="pt-3">
-      <div className="flex h-2.5 overflow-hidden rounded-full bg-white/60">
-        <div className="rounded-full bg-ink" style={{ width: `${cardPct}%` }} />
-      </div>
-      <div className="mt-2 flex justify-between text-xs font-medium text-foreground/70">
-        <span>Card {money(card)}</span>
-        <span>Cash {money(cash)}</span>
-      </div>
-    </div>
-  );
+function StatLabel({ children }: { children: React.ReactNode }) {
+  return <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">{children}</p>;
 }
 
 // ---------------------------------------------------------------------------
-// Top merchants, styled like the "Last Orders" rows
+// Top merchants
 // ---------------------------------------------------------------------------
 
 function TopMerchants({ summary }: { summary: Summary }) {
   return (
-    <section>
-      <h2 className="mb-3 text-lg font-semibold">Top merchants</h2>
+    <section className="card p-5 sm:p-6">
+      <h2 className="mb-3 text-lg">Top merchants</h2>
       {summary.top_merchants.length === 0 ? (
-        <p className="py-10 text-center text-sm text-muted">No purchases yet.</p>
+        <EmptyState title="No purchases yet.">Your biggest merchants will show up here.</EmptyState>
       ) : (
-        <ol>
+        <ol className="divide-y divide-border">
           {summary.top_merchants.map((m, i) => {
             const share = summary.total_spent > 0 ? (m.amount / summary.total_spent) * 100 : 0;
             return (
-              // Rows have no background until hovered, when they lift into a white pill
               <li
                 key={m.merchant}
-                className="-mx-4 grid grid-cols-[auto_1fr_auto] items-center gap-4 rounded-2xl px-4 py-3 text-sm transition hover:bg-surface hover:shadow-[0_8px_24px_-12px_rgb(35_35_35/0.15)] sm:grid-cols-[auto_1fr_90px_140px_100px]"
+                className="grid grid-cols-[auto_1fr_auto] items-center gap-4 py-3 text-sm sm:grid-cols-[auto_1fr_90px_120px_100px]"
               >
-                <Avatar name={m.merchant} color={i === 0 ? "#2b2b2b" : "#c9c3b5"} />
-                <span className="truncate font-semibold">{m.merchant}</span>
-                <span className="hidden text-muted sm:block">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-alt text-xs font-semibold tabular-nums text-text">
+                  {i + 1}
+                </span>
+                <span className="truncate font-semibold text-text">{m.merchant}</span>
+                <span className="hidden text-text-muted sm:block">
                   {m.count} {m.count === 1 ? "visit" : "visits"}
                 </span>
-                <span className="hidden items-center gap-2 text-muted sm:flex">
-                  <span className="h-2.5 w-2.5 rounded-sm bg-lavender" />
-                  {share.toFixed(1)}% of spend
-                </span>
-                <span className="text-right font-semibold tabular-nums">{money(m.amount)}</span>
+                <span className="hidden text-text-muted sm:block">{share.toFixed(1)}% of spend</span>
+                <Amount value={m.amount} className="text-right font-semibold text-text" />
               </li>
             );
           })}
@@ -235,39 +203,31 @@ function TopMerchants({ summary }: { summary: Summary }) {
 }
 
 // ---------------------------------------------------------------------------
-// Right-hand panel: category donut (white) over recent purchases (beige)
+// Right-hand panel: category donut over recent purchases
 // ---------------------------------------------------------------------------
 
 function SidePanel({ summary, recent }: { summary: Summary; recent: FeedEntry[] | null }) {
   return (
-    <aside className="card overflow-hidden self-start p-0">
+    <aside className="card self-start overflow-hidden">
       <div className="p-6">
-        <h2 className="text-lg font-semibold">By category</h2>
-        <p className="mt-1 text-sm text-muted">Where your money went</p>
+        <h2 className="text-lg">By category</h2>
+        <p className="mt-1 text-sm text-text-muted">Where your money went</p>
 
         {summary.by_category.length === 0 ? (
-          <p className="py-10 text-center text-sm text-muted">No spending yet.</p>
+          <EmptyState title="No spending yet." />
         ) : (
           <>
             <div className="mt-6">
               <CategoryDonut byCategory={summary.by_category} total={summary.total_spent} />
             </div>
-            {/* Legend: each category with a thin bar showing its share */}
-            <ul className="mt-6 space-y-3">
+            {/* Legend: colored dot, name, amount and share */}
+            <ul className="mt-6 space-y-2.5 text-sm">
               {summary.by_category.map((c) => (
-                <li key={c.category}>
-                  <div className="flex items-baseline justify-between text-sm">
-                    <span className="text-muted">{categoryLabel(c.category)}</span>
-                    <span className="font-semibold tabular-nums">
-                      {money(c.amount)} <span className="ml-1 text-xs font-medium text-muted">{c.pct.toFixed(0)}%</span>
-                    </span>
-                  </div>
-                  <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-track">
-                    <div
-                      className="h-full rounded-full"
-                      style={{ width: `${c.pct}%`, background: CATEGORY_STYLES[c.category].hex }}
-                    />
-                  </div>
+                <li key={c.category} className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: CATEGORY_STYLES[c.category].color }} />
+                  <span className="flex-1 text-text">{categoryLabel(c.category)}</span>
+                  <Amount value={c.amount} className="font-semibold text-text" />
+                  <span className="w-9 text-right text-xs tabular-nums text-text-muted">{c.pct.toFixed(0)}%</span>
                 </li>
               ))}
             </ul>
@@ -275,38 +235,35 @@ function SidePanel({ summary, recent }: { summary: Summary; recent: FeedEntry[] 
         )}
       </div>
 
-      <div className="bg-sand p-6">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Recent purchases</h2>
-          <Link href="/transactions" className="text-sm text-muted hover:text-foreground">
+      <div className="border-t border-border p-6">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-lg">Recent purchases</h2>
+          <Link href="/transactions" className="link text-sm">
             See all
           </Link>
         </div>
 
         {recent === null ? (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {Array.from({ length: 4 }, (_, i) => (
-              <div key={i} className="skeleton h-16 rounded-2xl" />
+              <div key={i} className="skeleton h-12 rounded-[10px]" />
             ))}
           </div>
         ) : recent.length === 0 ? (
-          <p className="py-6 text-center text-sm text-muted">No purchases yet. Scan a receipt to start.</p>
+          <EmptyState title="No receipts yet.">Snap one with the Shortcut.</EmptyState>
         ) : (
-          <ul className="space-y-3">
+          <ul className="-mx-2">
             {recent.map((e) => (
-              <li
-                key={e.id}
-                className="flex items-center gap-3 rounded-2xl bg-white/60 px-4 py-3 transition hover:bg-surface hover:shadow-[0_8px_24px_-12px_rgb(35_35_35/0.15)]"
-              >
-                <Avatar name={e.merchant} color={CATEGORY_STYLES[e.category].hex} />
+              <li key={e.id} className="flex items-center gap-3 rounded-[10px] px-2 py-2 hover:bg-surface-alt">
+                <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: CATEGORY_STYLES[e.category].color }} />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold">{e.merchant}</p>
-                  <p className="truncate text-xs text-muted">
+                  <p className="truncate text-sm font-semibold text-text">{e.merchant}</p>
+                  <p className="truncate text-xs text-text-muted">
                     {shortDate(e.date)} · {e.type === "cash" ? "Cash" : categoryLabel(e.category)}
                     {e.receipt_id && " · Itemized"}
                   </p>
                 </div>
-                <span className="text-sm font-semibold tabular-nums">{money(e.amount)}</span>
+                <Amount value={e.amount} className="text-sm font-semibold text-text" />
               </li>
             ))}
           </ul>
@@ -319,18 +276,6 @@ function SidePanel({ summary, recent }: { summary: Summary; recent: FeedEntry[] 
 // ---------------------------------------------------------------------------
 // Small pieces
 // ---------------------------------------------------------------------------
-
-// Round badge with the merchant's first letter (stands in for a logo).
-function Avatar({ name, color }: { name: string; color: string }) {
-  return (
-    <span
-      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
-      style={{ background: color }}
-    >
-      {name.charAt(0).toUpperCase()}
-    </span>
-  );
-}
 
 function Notices({ mocked, error }: { mocked: readonly string[]; error: string | null }) {
   return (
@@ -345,23 +290,20 @@ function Notices({ mocked, error }: { mocked: readonly string[]; error: string |
   );
 }
 
-// Colored banner for "sample data" and error messages.
-function Notice({ tone, children }: { tone: "info" | "error"; children: React.ReactNode }) {
-  const styles = tone === "error" ? "bg-red-50 text-red-800" : "bg-butter/40 text-foreground/80";
-  return <p className={`mb-6 rounded-2xl px-4 py-2.5 text-sm ${styles}`}>{children}</p>;
-}
-
 function Skeleton() {
   return (
     <div className="grid grid-cols-1 gap-8 xl:grid-cols-[minmax(0,1fr)_340px]" aria-busy="true">
-      <div className="space-y-10">
-        <div className="skeleton h-12 w-48" />
+      <div className="space-y-8">
+        <div className="flex items-center gap-3">
+          <Coin size={28} className="animate-pulse opacity-40" />
+          <div className="skeleton h-8 w-40" />
+        </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {Array.from({ length: 3 }, (_, i) => (
             <div key={i} className="skeleton h-36" />
           ))}
         </div>
-        <div className="skeleton h-72" />
+        <div className="skeleton h-80" />
         <div className="skeleton h-56" />
       </div>
       <div className="skeleton h-[640px]" />

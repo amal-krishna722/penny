@@ -7,7 +7,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Wrench } from "lucide-react";
+import { Coin } from "@/components/Logo";
 import PageHeader from "@/components/PageHeader";
+import { Notice } from "@/components/ui";
 import { ask, isMocked, SUGGESTED_QUESTIONS } from "@/lib/api";
 import type { ToolCall } from "@/lib/types";
 
@@ -54,7 +57,7 @@ export default function AskPage() {
           <button
             onClick={() => setMessages([])}
             disabled={loading}
-            className="rounded-md border border-neutral-200 bg-white px-3 py-1.5 text-sm text-neutral-700 hover:bg-neutral-50 disabled:opacity-50"
+            className="btn-secondary px-3 py-1.5"
           >
             Clear chat
           </button>
@@ -62,18 +65,19 @@ export default function AskPage() {
       </PageHeader>
 
       {isMocked("ask") && (
-        <p className="mb-4 rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-800">
-          Sample answers: the backend isn&apos;t connected for this page yet. The suggested questions have canned replies.
-        </p>
+        <Notice tone="info">
+          Sample answers: the backend doesn&apos;t have /ask yet. The suggested questions have canned replies.
+        </Notice>
       )}
 
-      <div className="flex min-h-[60vh] flex-col rounded-lg border border-neutral-200 bg-white">
+      <div className="card flex min-h-[60vh] flex-col">
         {/* Conversation */}
         <div className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-6">
           {empty ? (
-            <div className="py-10 text-center">
-              <p className="text-sm font-medium text-neutral-900">Ask anything about where your money went</p>
-              <p className="mt-1 text-sm text-neutral-500">
+            <div className="flex flex-col items-center py-10 text-center">
+              <Coin size={44} className="opacity-30" />
+              <p className="mt-3 text-sm font-semibold text-text">Ask anything about where your money went</p>
+              <p className="mt-1 text-sm text-text-muted">
                 Answers come from your receipts and bank transactions, including cash.
               </p>
             </div>
@@ -82,7 +86,7 @@ export default function AskPage() {
           )}
 
           {loading && (
-            <div className="flex items-center gap-2 text-sm text-neutral-500" aria-live="polite">
+            <div className="flex items-center gap-2 text-sm text-text-muted" aria-live="polite">
               <span className="flex gap-1">
                 <Dot delay="0ms" />
                 <Dot delay="150ms" />
@@ -95,15 +99,15 @@ export default function AskPage() {
         </div>
 
         {/* Suggested questions: always visible so the demo can click through them */}
-        <div className="border-t border-neutral-100 px-4 pt-3 sm:px-6">
-          <p className="mb-2 text-xs font-medium uppercase tracking-wide text-neutral-500">Try asking</p>
+        <div className="border-t border-border px-4 pt-3 sm:px-6">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-muted">Try asking</p>
           <div className="flex flex-wrap gap-2">
             {SUGGESTED_QUESTIONS.map((q) => (
               <button
                 key={q}
                 onClick={() => send(q)}
                 disabled={loading}
-                className="rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-sm text-neutral-700 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 disabled:opacity-50"
+                className="rounded-full border border-border bg-surface px-3 py-1 text-sm text-text hover:border-accent hover:bg-accent-soft disabled:opacity-50"
               >
                 {q}
               </button>
@@ -123,13 +127,13 @@ export default function AskPage() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="e.g. How much did I spend on dining last week?"
-            className="min-w-0 flex-1 rounded-md border border-neutral-300 px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            className="field min-w-0 flex-1"
             aria-label="Your question"
           />
           <button
             type="submit"
             disabled={loading || !input.trim()}
-            className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 disabled:opacity-40"
+            className="btn-primary"
           >
             Ask
           </button>
@@ -143,23 +147,27 @@ function Bubble({ message }: { message: Message }) {
   if (message.role === "user") {
     return (
       <div className="flex justify-end">
-        <p className="max-w-[80%] rounded-2xl rounded-br-sm bg-neutral-900 px-4 py-2 text-sm text-white">{message.text}</p>
+        <p className="max-w-[80%] rounded-2xl rounded-br-sm bg-primary px-4 py-2 text-sm text-on-primary">{message.text}</p>
       </div>
     );
   }
 
   if (message.role === "error") {
-    return <p className="max-w-[80%] rounded-md bg-red-50 px-4 py-2 text-sm text-red-800">{message.text}</p>;
+    return (
+      <p role="alert" className="max-w-[80%] rounded-2xl border border-danger/30 bg-danger/10 px-4 py-2 text-sm text-danger">
+        {message.text}
+      </p>
+    );
   }
 
   return (
     <div className="max-w-[80%]">
-      <p className="whitespace-pre-wrap rounded-2xl rounded-bl-sm bg-neutral-100 px-4 py-2 text-sm text-neutral-900">
+      <p className="whitespace-pre-wrap rounded-2xl rounded-bl-sm border border-border bg-surface px-4 py-2 text-sm text-text">
         {message.text}
       </p>
       {message.tools.length > 0 && (
         <div className="mt-1.5 flex flex-wrap items-center gap-1.5 pl-1">
-          <span className="text-xs text-neutral-400">Looked up:</span>
+          <span className="text-xs text-text-muted">Looked up:</span>
           {message.tools.map((t, i) => (
             <ToolChip key={i} tool={t} />
           ))}
@@ -178,15 +186,15 @@ function ToolChip({ tool }: { tool: ToolCall }) {
   return (
     <span
       title={args || "no arguments"}
-      className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 font-mono text-[11px] text-indigo-700"
+      className="pill bg-accent-soft font-mono font-medium text-accent-ink"
     >
-      <span aria-hidden>⚙</span>
+      <Wrench size={11} aria-hidden="true" />
       {tool.name}
-      {args && <span className="hidden text-indigo-400 sm:inline">({args})</span>}
+      {args && <span className="hidden font-normal sm:inline">({args})</span>}
     </span>
   );
 }
 
 function Dot({ delay }: { delay: string }) {
-  return <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-neutral-400" style={{ animationDelay: delay }} />;
+  return <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-accent" style={{ animationDelay: delay }} />;
 }

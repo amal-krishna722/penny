@@ -1,30 +1,34 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Manrope } from "next/font/google";
+import { Fraunces, Inter } from "next/font/google";
 import Sidebar from "@/components/Sidebar";
 import "./globals.css";
 
-// next/font downloads the font at build time and serves it from our own
-// site, so there's no request to Google when someone opens the page.
-const manrope = Manrope({
-  variable: "--font-manrope",
+// next/font downloads the fonts at build time and serves them from our own
+// site, so opening the page makes no request to Google. Each font is exposed
+// as a CSS variable that app/globals.css plugs into Tailwind.
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+// Fraunces is a "soft" serif for headings and the wordmark. It's a variable
+// font, so weights 500 and 600 both come from one file.
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
+  axes: ["SOFT"],
 });
 
 export const metadata: Metadata = {
-  title: "Itemize",
-  description: "See where it went: every receipt, itemized and matched to your bank.",
+  title: "Penny · Every cent, itemized.",
+  description: "Every cent, itemized. Penny reads your receipts and matches them to your bank, so you see what you actually bought.",
 };
 
 // The root layout wraps every page. `children` is whichever page.tsx matches
 // the URL, so the sidebar stays put while the main area swaps pages.
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${manrope.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="en" className={`${inter.variable} ${fraunces.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col md:flex-row">
         <Sidebar />
         {/* max-w keeps lines and charts from stretching too wide on big monitors */}

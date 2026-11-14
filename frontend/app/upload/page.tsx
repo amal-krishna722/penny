@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Coin } from "@/components/Logo";
 import PageHeader from "@/components/PageHeader";
+import ShortcutQR from "@/components/ShortcutQR";
 import { Amount, Notice } from "@/components/ui";
 import { CategoryChip } from "@/components/TransactionRow";
 import { isMocked, uploadReceipt } from "@/lib/api";
@@ -145,8 +146,8 @@ export default function UploadPage() {
           )}
         </div>
 
-        {/* Right: what came back */}
-        <div>
+        {/* Right: what came back, then the Shortcut QR code */}
+        <div className="space-y-6">
           {status.kind === "idle" && (
             <div className="card p-6 text-sm text-text-muted">
               <h2 className="text-lg text-text">What happens next</h2>
@@ -175,6 +176,8 @@ export default function UploadPage() {
           )}
 
           {status.kind === "done" && <ResultCard result={status.result} onReset={reset} />}
+
+          <ShortcutQR />
         </div>
       </div>
     </>

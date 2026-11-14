@@ -1,4 +1,4 @@
-# Person B: every call to the Capital One Nessie API (our mock bank) lives here.
+# Amal (Person B): every call to the Capital One Nessie API (our mock bank) lives here.
 import requests
 
 from app.config import NESSIE_API_KEY

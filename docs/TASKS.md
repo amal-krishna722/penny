@@ -139,7 +139,7 @@ You own `backend/app/bank/`, `backend/app/insights/`, `backend/scripts/`, `backe
 
 ### B0. Unblock everyone (target 11:30 AM)
 - [x] `main.py`, `config.py`, `db.py` and all 4 empty routers (done in the skeleton)
-- [ ] **Files:** `backend/app/models.py`, `backend/app/bank/matching.py`
+- [x] **Files:** `backend/app/models.py`, `backend/app/bank/matching.py` (plus a `sync_from_nessie()` stub in `bank/router.py` for A6)
 - **Build:**
   - Pydantic models for every shape in SPEC section 3 and the request and response bodies in section 4.
   - A stub: `def match_receipt(receipt_id: str): return None`

@@ -109,7 +109,7 @@ You own `backend/app/receipts/`, `backend/app/dashboard/` and `shortcut/`.
 - **Done when:** a matched pair appears once, cash receipts show `type: "cash"`, newest first.
 
 ### A5. iPhone Shortcut (target 4:00 PM)
-- [ ] **File:** `shortcut/README.md` (write down the steps and the iCloud share link)
+- [x] **File:** `shortcut/README.md` (write down the steps and the iCloud share link)
 - **Build in the Shortcuts app:**
   1. Take Photo
   2. Convert Image → JPEG

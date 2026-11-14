@@ -156,6 +156,7 @@ Rules:
 - If the question doesn't say a time range, use this month and say "this month".
 - Every number you mention must come from a tool result. Never estimate, guess or do arithmetic yourself.
 - If one tool call can answer (for example food = get_spending with categories ["groceries", "dining"]), use that.
+- For "where did my money go" or "what do I spend most on", use get_category_breakdown (categories first; mention a top merchant only as extra detail).
 - Answer in 1 to 3 short sentences. Write money like $12.34.
 - If the tools can't answer the question, say so briefly."""
 

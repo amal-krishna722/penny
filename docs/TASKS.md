@@ -103,7 +103,7 @@ You own `backend/app/receipts/`, `backend/app/dashboard/` and `shortcut/`.
 - **Done when:** a teammate on another network can open `<url>/health`.
 
 ### A4. Transaction feed (target 3:00 PM)
-- [ ] **Files:** `backend/app/dashboard/feed.py`, `backend/app/dashboard/router.py`
+- [x] **Files:** `backend/app/dashboard/feed.py`, `backend/app/dashboard/router.py`
 - **Build:** `GET /transactions` using the table in SPEC section 3 (FeedEntry). Support the `start`, `end`, `category` and `type` filters.
 - **Test:** before Person B's Nessie data exists, insert 2 or 3 fake transactions in MongoDB by hand.
 - **Done when:** a matched pair appears once, cash receipts show `type: "cash"`, newest first.

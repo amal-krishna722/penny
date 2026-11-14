@@ -1,0 +1,4 @@
+# Person C: run create-next-app here (task C1). It is fine to let it replace this file.
+node_modules/
+.next/
+.env.local

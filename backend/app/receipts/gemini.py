@@ -2,13 +2,22 @@
 import json
 from datetime import date
 
+import httpx2  # the HTTP library google-genai uses under the hood
 from google import genai
-from google.genai import types
+from google.genai import errors, types
 
 from app.config import GEMINI_API_KEY
 
-# Flash model that answered reliably in testing (3.7/3.8 were overloaded and timing out).
-MODEL = "gemini-3.5-flash"
+# Models to try, in order. If one is overloaded we fall back to the next, so a
+# busy Gemini model doesn't break the demo. (3.7/3.8 were timing out in testing;
+# 2.5 is retired.) The "lite" models are less accurate but rarely overloaded.
+MODELS = ["gemini-3.5-flash", "gemini-3.6-flash", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite"]
+
+# Give up on a model after 20 s and try the next one, instead of hanging forever.
+TIMEOUT_MS = 20_000
+
+# Error codes that mean "busy, try again": 429 rate limit, 500/503/504 server-side.
+RETRYABLE_CODES = {429, 500, 503, 504}
 
 # Allowed categories (SPEC section 3).
 CATEGORIES = [
@@ -39,7 +48,10 @@ _client = None
 def _get_client() -> genai.Client:
     global _client
     if _client is None:
-        _client = genai.Client(api_key=GEMINI_API_KEY)
+        _client = genai.Client(
+            api_key=GEMINI_API_KEY,
+            http_options=types.HttpOptions(timeout=TIMEOUT_MS),
+        )
     return _client
 
 
@@ -58,18 +70,36 @@ def _category(value) -> str:
     return value if value in CATEGORIES else "other"
 
 
+def _call_gemini(image_bytes: bytes, mime_type: str):
+    """Try each model in MODELS until one answers. Busy errors and timeouts
+    move on to the next model; other errors (bad key, bad image) raise immediately."""
+    last_error = None
+    for model in MODELS:
+        try:
+            return _get_client().models.generate_content(
+                model=model,
+                contents=[
+                    types.Part.from_bytes(data=image_bytes, mime_type=mime_type),
+                    PROMPT,
+                ],
+                # Forces Gemini to answer with raw JSON (no ```json fences).
+                config=types.GenerateContentConfig(response_mime_type="application/json"),
+            )
+        except errors.APIError as e:
+            if e.code not in RETRYABLE_CODES:
+                raise
+            last_error = e
+            print(f"Gemini {model} busy ({e.code}), trying next model")
+        except httpx2.TimeoutException as e:
+            last_error = e
+            print(f"Gemini {model} timed out, trying next model")
+    raise last_error
+
+
 def extract_receipt(image_bytes: bytes, mime_type: str) -> dict:
     """Send the image to Gemini. Returns merchant, date, subtotal, tax, tip,
     total, category, items. Raises ValueError if the image is unreadable."""
-    response = _get_client().models.generate_content(
-        model=MODEL,
-        contents=[
-            types.Part.from_bytes(data=image_bytes, mime_type=mime_type),
-            PROMPT,
-        ],
-        # Forces Gemini to answer with raw JSON (no ```json fences).
-        config=types.GenerateContentConfig(response_mime_type="application/json"),
-    )
+    response = _call_gemini(image_bytes, mime_type)
 
     try:
         data = json.loads(response.text or "")

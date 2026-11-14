@@ -99,7 +99,7 @@ You own `backend/app/receipts/`, `backend/app/dashboard/` and `shortcut/`.
 - **Done when:** the receipt shows up in MongoDB Atlas and the response matches SPEC.
 
 ### A3. Public URL (target 2:00 PM)
-- [ ] Install ngrok, run `ngrok http 8000`, post the `https://...` URL in the group chat.
+- [x] Install ngrok, run `ngrok http 8000`, post the `https://...` URL in the group chat.
 - **Done when:** a teammate on another network can open `<url>/health`.
 
 ### A4. Transaction feed (target 3:00 PM)

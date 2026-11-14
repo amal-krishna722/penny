@@ -22,6 +22,18 @@ def doc_to_receipt(doc: dict) -> dict:
 
 def save_receipt(extracted: dict, source: str) -> str:
     """Insert a freshly extracted receipt as unmatched cash. Returns its id string."""
+    # Duplicate guard: scanning the same receipt twice shouldn't count the purchase twice.
+    # We compare only merchant, date and total, because Gemini can word line items
+    # slightly differently each time it reads the same image.
+    existing = receipts.find_one({
+        "user_id": "demo",
+        "merchant": extracted.get("merchant"),
+        "date": extracted.get("date"),
+        "total": extracted.get("total"),
+    })
+    if existing:
+        return existing.get("id") or str(existing["_id"])
+
     oid = ObjectId()
     doc = {
         **extracted,

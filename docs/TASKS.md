@@ -78,7 +78,7 @@ If what you need isn't ready, keep using fake data and swap later. Don't block.
 You own `backend/app/receipts/`, `backend/app/dashboard/` and `shortcut/`.
 
 ### A1. Gemini extraction (target 12:30 PM)
-- [ ] **File:** `backend/app/receipts/gemini.py`
+- [x] **File:** `backend/app/receipts/gemini.py`
 - **Build:** `extract_receipt(image_bytes, mime_type) -> dict` (signature in SPEC section 5).
   - Use the `google-genai` SDK with a current Flash model and `response_mime_type="application/json"`.
   - The prompt asks for: merchant, date (YYYY-MM-DD), subtotal, tax, tip, total, category, items (name, price, quantity, category). Paste the category list from SPEC section 3 into the prompt and say "use only these".
@@ -87,7 +87,7 @@ You own `backend/app/receipts/`, `backend/app/dashboard/` and `shortcut/`.
 - **Done when:** it returns clean JSON for every test receipt.
 
 ### A2. POST /receipt (target 1:30 PM)
-- [ ] **File:** `backend/app/receipts/router.py`
+- [x] **File:** `backend/app/receipts/router.py`
 - **Build:**
   1. Check the `X-API-Key` header against `API_SECRET` from `app.config`. Wrong → `401`.
   2. Read the uploaded `file`, call `extract_receipt`.

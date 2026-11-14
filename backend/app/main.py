@@ -5,8 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import FRONTEND_URL
 from app.receipts.router import router as receipts_router    # Person A
 from app.dashboard.router import router as dashboard_router  # Person A
-from app.bank.router import router as bank_router            # Person B
-from app.insights.router import router as insights_router    # Person B
+from app.bank.router import router as bank_router            # Amal (Person B)
+from app.insights.router import router as insights_router    # Amal (Person B)
 
 app = FastAPI(title="Itemize API")
 

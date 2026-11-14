@@ -1,4 +1,4 @@
-# Person B: receipt-to-transaction matching. Deterministic, no LLM (see TASKS.md B4).
+# Amal (Person B): receipt-to-transaction matching. Deterministic, no LLM (see TASKS.md B4).
 
 
 def match_receipt(receipt_id: str) -> dict | None:

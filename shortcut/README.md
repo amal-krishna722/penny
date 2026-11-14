@@ -3,8 +3,8 @@
 Double-tap the back of your iPhone, photograph a receipt, and it's added to Itemize.
 
 ## Install
-1. On your iPhone, open the iCloud link: **<ICLOUD_SHARE_LINK_GOES_HERE>**
-2. Tap **Add Shortcut**. When asked, paste the API key from the team (never commit it or post it publicly).
+1. Scan the install QR code shown in the Itemize app, or ask the team for the iCloud link. The link isn't posted here because it contains the API key.
+2. Tap **Add Shortcut**. You don't need Back Tap to try it: tap the Shortcut in the Shortcuts app and photograph a receipt.
 
 ## Or build it yourself (6 actions)
 1. **Take Photo** (Show Camera Preview on)

@@ -30,6 +30,12 @@ uvicorn app.main:app --reload   # open http://localhost:8000/health
 ```
 VS Code: Cmd+Shift+P → **Python: Select Interpreter** → `backend/.venv/bin/python`.
 
+## Git habits
+- `git pull` before you start, commit only files in your own folders, push often.
+- Start commit messages with your task ID: `A2: POST /receipt saves to MongoDB`.
+- Never commit `.env`. Keys go in the group chat only.
+- Added a Python package? `pip freeze > requirements.txt` inside the venv, then commit it.
+
 ## Working alone vs. needing each other
 
 **You can start right away without waiting for anyone:**

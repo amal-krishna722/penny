@@ -1,73 +1,49 @@
-# Itemize: see where it went
+# Itemize
 
-An AI financial ledger that shows what you actually bought, not just what your bank charged.
-Your bank says `AMAZON $84.12`. Itemize says $60 of groceries and a $24 phone case, and it also tracks cash purchases your bank never sees.
+Your bank statement says `AMAZON $84.12`. That one line was actually $60 of groceries and a $24 phone case. Itemize reads your receipts and fills in what the bank leaves out, including the cash purchases it never sees at all.
 
-**How it works:** double-tap the back of an iPhone → a Shortcut sends a receipt photo to our API → Gemini reads the line items → we match it to a bank transaction (Capital One Nessie) or record it as cash → the dashboard updates.
+Built at HackUMass XIV.
 
-Built at HackUMass XIV with FastAPI, Gemini, MongoDB Atlas, Capital One Nessie and Next.js.
+## How it works
 
----
+You double-tap the back of your iPhone. An Apple Shortcut takes a photo of the receipt and sends it to our backend, where Gemini pulls out the store, date, total and every line item with a category.
 
-## Who owns what
+We then look for the matching charge in your bank transactions. For the hackathon, Capital One's Nessie API stands in for a real bank. The matching is plain code, not AI: the amounts have to line up (with room for a tip at restaurants), the dates have to be within two days, and the merchant names have to be a close fuzzy match, since banks write things like `CHIPOTLE 2741 AMHERST`. If nothing matches, the purchase is logged as cash.
 
-| Person | Job | Folders |
-|---|---|---|
-| **A** | Receipt capture and dashboard data | `backend/app/receipts/`, `backend/app/dashboard/`, `shortcut/` |
-| **B** | Bank data, matching and Ask AI | `backend/app/bank/`, `backend/app/insights/`, `backend/scripts/` |
-| **C** | Frontend | `frontend/` |
+The dashboard breaks your spending down by category, spots recurring subscriptions, and has an Ask AI box. When you ask "how much did I spend on food this month?", Gemini calls functions that query the database and does no math of its own, so the numbers come from your actual data.
 
-Shared files (`main.py`, `config.py`, `db.py`, `models.py`): ask in the group chat before editing.
+## Stack
 
-## Docs
-- [`docs/TASKS.md`](docs/TASKS.md): your task list, what you can do alone and who is waiting on you
-- [`docs/SPEC.md`](docs/SPEC.md): data shapes and endpoints (the contract between A, B and C)
+- Backend: Python and FastAPI
+- AI: Gemini API
+- Database: MongoDB Atlas
+- Bank data: Capital One Nessie API
+- Frontend: Next.js, Tailwind and Recharts
+- Capture: Apple Shortcuts with Back Tap
 
----
+## Running it locally
 
-## Setup (once)
+You'll need a Gemini API key, a Nessie API key and a MongoDB Atlas connection string.
 
-```bash
-git clone https://github.com/amal-krishna722/itemize.git
-cd itemize/backend
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env      # then paste the real keys from the group chat
-```
-
-**VS Code:** Cmd+Shift+P → **Python: Select Interpreter** → `backend/.venv/bin/python`.
-
-## Run the backend
+Backend (Python 3.10+):
 
 ```bash
 cd backend
+python3 -m venv .venv
 source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env    # fill in your keys
 uvicorn app.main:app --reload
 ```
-- Health check: http://localhost:8000/health should show `{"ok": true}`
-- API docs: http://localhost:8000/docs (each person's endpoints show up here once they add them)
 
-## Run the frontend (after Person C sets it up)
+The API docs are at http://localhost:8000/docs.
+
+Frontend:
 
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-Open http://localhost:3000.
 
----
-
-## Git workflow
-
-```bash
-git pull                     # always before you start
-git add <your files>
-git commit -m "A2: POST /receipt saves to MongoDB"
-git push
-```
-- Start commit messages with your task ID (A2, B4, C3) so everyone can see progress.
-- Only commit files in your own folders.
-- **Never commit `.env`.** It is already in `.gitignore`. Share keys in the group chat only.
-- Added a Python package? Run `pip freeze > requirements.txt` inside the venv and commit it.
+Then open http://localhost:3000. The API contract between the backend and frontend is in [docs/SPEC.md](docs/SPEC.md).

@@ -128,8 +128,8 @@ You own `backend/app/receipts/`, `backend/app/dashboard/` and `shortcut/`.
 
 ### A7. After freeze
 - [ ] Deploy the backend to Vultr if there's time (Vultr prize), otherwise keep ngrok running on one laptop.
-- [ ] Print or screenshot the 4 demo receipts (listed in Person B's task B2).
-- [ ] Own the Devpost write-up draft.
+- [x] Print or screenshot the 4 demo receipts (listed in Person B's task B2).
+- [x] Own the Devpost write-up draft.
 
 ---
 

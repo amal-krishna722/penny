@@ -1,8 +1,8 @@
 # Owner: Person A. MongoDB helpers for the `receipts` collection.
 #
-# ID convention (agreed with Person B): documents only have MongoDB's own `_id`
-# (an ObjectId). Outside MongoDB we always use `id = str(_id)`. To look a receipt
-# up by that string: receipts.find_one({"_id": ObjectId(receipt_id)}).
+# ID convention (SPEC section 3): every document stores a string `id`, equal to
+# str(_id). Look receipts up by it: receipts.find_one({"id": receipt_id}).
+# `_id` stays inside MongoDB and is never returned by the API.
 from datetime import datetime, timezone
 
 from bson import ObjectId
@@ -14,15 +14,19 @@ from app.models import Receipt
 def doc_to_receipt(doc: dict) -> dict:
     """Turn a raw MongoDB document into the SPEC Receipt shape (`_id` becomes `id`)."""
     doc = dict(doc)
-    doc["id"] = str(doc.pop("_id"))
+    oid = doc.pop("_id")
+    doc.setdefault("id", str(oid))  # fallback for old test docs saved before `id` existed
     # Validating through the shared model guarantees the response matches SPEC.
     return Receipt(**doc).model_dump()
 
 
 def save_receipt(extracted: dict, source: str) -> str:
     """Insert a freshly extracted receipt as unmatched cash. Returns its id string."""
+    oid = ObjectId()
     doc = {
         **extracted,
+        "_id": oid,
+        "id": str(oid),
         "user_id": "demo",
         "source": source,
         # UTC time like "2026-11-14T15:30:00Z"
@@ -31,12 +35,12 @@ def save_receipt(extracted: dict, source: str) -> str:
         "matched_transaction_id": None,
         "match_confidence": None,
     }
-    result = receipts.insert_one(doc)
-    return str(result.inserted_id)
+    receipts.insert_one(doc)
+    return doc["id"]
 
 
 def get_receipt(receipt_id: str) -> dict:
-    return doc_to_receipt(receipts.find_one({"_id": ObjectId(receipt_id)}))
+    return doc_to_receipt(receipts.find_one({"id": receipt_id}))
 
 
 def list_receipts() -> list[dict]:

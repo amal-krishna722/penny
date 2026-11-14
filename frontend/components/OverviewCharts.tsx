@@ -1,110 +1,117 @@
-// The two Overview charts (task C4). Recharts draws with SVG in the browser,
-// so this file is a Client Component.
+// The Overview charts. Recharts draws with SVG in the browser, so this file
+// is a Client Component.
 "use client";
 
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Bar, BarChart, Cell, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { CATEGORY_STYLES, categoryLabel, money, shortDate } from "@/lib/format";
 import type { CategoryAmount, DailyAmount } from "@/lib/types";
 
-/** Spending per day. An area chart is a line chart with the space under it filled. */
-export function DailyChart({ daily }: { daily: DailyAmount[] }) {
+// Recharts needs real color values, not Tailwind classes. These match the
+// tokens in app/globals.css.
+const INK = "#2b2b2b";
+const TRACK = "#efebe1";
+const MUTED = "#8f8b82";
+
+// Tooltip box style: white, rounded, soft shadow, like the cards.
+const TOOLTIP_STYLE = {
+  borderRadius: 12,
+  border: "none",
+  boxShadow: "0 8px 24px -8px rgb(35 35 35 / 0.2)",
+  fontSize: 13,
+  fontWeight: 600,
+};
+
+/**
+ * Spending per day as dark rounded bars. `background` draws the beige
+ * "track" behind each bar, so every day has a full-height pill and the
+ * dark part shows how much of it was spent.
+ */
+export function DailyBars({ daily }: { daily: DailyAmount[] }) {
   return (
     // ResponsiveContainer makes the chart as wide as its parent div.
-    <ResponsiveContainer width="100%" height={240}>
-      <AreaChart data={daily} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-        <defs>
-          {/* Soft fade from the line color to transparent under the line */}
-          <linearGradient id="dailyFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#10b981" stopOpacity={0.25} />
-            <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
-          </linearGradient>
-        </defs>
-        <CartesianGrid vertical={false} stroke="#f0f0f0" />
+    <ResponsiveContainer width="100%" height={260}>
+      <BarChart data={daily} margin={{ top: 8, right: 0, left: 0, bottom: 0 }} barCategoryGap="12%">
         <XAxis
           dataKey="date"
           tickFormatter={shortDate}
-          tick={{ fontSize: 12, fill: "#737373" }}
+          tick={{ fontSize: 12, fill: MUTED }}
           tickLine={false}
           axisLine={false}
           minTickGap={24}
+          tickMargin={10}
         />
         <YAxis
           tickFormatter={(v: number) => `$${v}`}
-          tick={{ fontSize: 12, fill: "#737373" }}
+          tick={{ fontSize: 12, fill: MUTED }}
           tickLine={false}
           axisLine={false}
           width={48}
         />
         <Tooltip
+          cursor={false}
           labelFormatter={(label) => shortDate(String(label))}
           formatter={(value) => [money(Number(value)), "Spent"]}
-          contentStyle={{ borderRadius: 8, borderColor: "#e5e5e5", fontSize: 13 }}
+          contentStyle={TOOLTIP_STYLE}
         />
-        <Area type="monotone" dataKey="amount" stroke="#10b981" strokeWidth={2} fill="url(#dailyFill)" />
-      </AreaChart>
+        <Bar
+          dataKey="amount"
+          fill={INK}
+          radius={6}
+          background={{ fill: TRACK, radius: 6 }}
+          // The hovered bar turns lavender
+          activeBar={{ fill: "#a9a7f5" }}
+        />
+      </BarChart>
     </ResponsiveContainer>
   );
 }
 
-/** Donut of spending by category, with a legend listing amount and percent. */
-export function CategoryDonut({ byCategory, total }: { byCategory: CategoryAmount[]; total: number }) {
-  if (byCategory.length === 0) {
-    return <p className="py-10 text-center text-sm text-neutral-500">No spending yet.</p>;
-  }
-
+/** A tiny line with no axes, drawn inside the pastel stat cards. */
+export function Sparkline({ values, color }: { values: number[]; color: string }) {
+  const data = values.map((v, i) => ({ i, v }));
   return (
-    <div className="flex flex-col items-center gap-6 sm:flex-row">
-      {/* The total sits in the donut's hole, layered on top with absolute positioning */}
-      <div className="relative h-48 w-48 shrink-0">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={byCategory}
-              dataKey="amount"
-              nameKey="category"
-              innerRadius="62%"
-              outerRadius="100%"
-              paddingAngle={1}
-              stroke="none"
-            >
-              {/* One <Cell> per slice so each category gets its own color */}
-              {byCategory.map((c) => (
-                <Cell key={c.category} fill={CATEGORY_STYLES[c.category].hex} />
-              ))}
-            </Pie>
-            <Tooltip
-              formatter={(value, name) => [money(Number(value)), categoryLabel(name as CategoryAmount["category"])]}
-              contentStyle={{ borderRadius: 8, borderColor: "#e5e5e5", fontSize: 13 }}
-            />
-          </PieChart>
-        </ResponsiveContainer>
-        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-xs text-neutral-500">Total</span>
-          <span className="font-mono text-sm font-semibold tabular-nums text-neutral-900">{money(total)}</span>
-        </div>
-      </div>
+    <ResponsiveContainer width="100%" height={48}>
+      <LineChart data={data} margin={{ top: 4, right: 2, left: 2, bottom: 4 }}>
+        {/* domain "dataMin" makes the line use the full height even if all values are large */}
+        <YAxis hide domain={["dataMin", "dataMax"]} />
+        <Line type="monotone" dataKey="v" stroke={color} strokeWidth={2.5} dot={false} isAnimationActive={false} />
+      </LineChart>
+    </ResponsiveContainer>
+  );
+}
 
-      <ul className="w-full space-y-2 text-sm">
-        {byCategory.map((c) => (
-          <li key={c.category} className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: CATEGORY_STYLES[c.category].hex }} />
-            <span className="flex-1 text-neutral-700">{categoryLabel(c.category)}</span>
-            <span className="font-mono tabular-nums text-neutral-900">{money(c.amount)}</span>
-            <span className="w-12 text-right text-xs tabular-nums text-neutral-500">{c.pct.toFixed(1)}%</span>
-          </li>
-        ))}
-      </ul>
+/** Donut of spending by category with the total in the middle. */
+export function CategoryDonut({ byCategory, total }: { byCategory: CategoryAmount[]; total: number }) {
+  return (
+    // The total sits in the donut's hole, layered on top with absolute positioning
+    <div className="relative mx-auto h-44 w-44 shrink-0">
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Pie
+            data={byCategory}
+            dataKey="amount"
+            nameKey="category"
+            innerRadius="66%"
+            outerRadius="100%"
+            paddingAngle={2}
+            cornerRadius={6}
+            stroke="none"
+          >
+            {/* One <Cell> per slice so each category gets its own color */}
+            {byCategory.map((c) => (
+              <Cell key={c.category} fill={CATEGORY_STYLES[c.category].hex} />
+            ))}
+          </Pie>
+          <Tooltip
+            formatter={(value, name) => [money(Number(value)), categoryLabel(name as CategoryAmount["category"])]}
+            contentStyle={TOOLTIP_STYLE}
+          />
+        </PieChart>
+      </ResponsiveContainer>
+      <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-xs text-muted">Total</span>
+        <span className="text-lg font-bold tabular-nums text-foreground">{money(total)}</span>
+      </div>
     </div>
   );
 }

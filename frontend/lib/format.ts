@@ -41,18 +41,18 @@ export function categoryLabel(category: Category): string {
 }
 
 // One color per category. `chip` is Tailwind classes for badges, `hex` is for
-// Recharts later (charts need real color values, not class names).
+// Recharts and the Overview avatars (soft pastels to match the dashboard look) (charts need real color values, not class names).
 // Class names are written out in full because Tailwind only generates
 // classes it can find as complete strings in the source code.
 export const CATEGORY_STYLES: Record<Category, { chip: string; hex: string }> = {
-  groceries: { chip: "bg-emerald-50 text-emerald-700 ring-emerald-600/20", hex: "#10b981" },
-  dining: { chip: "bg-orange-50 text-orange-700 ring-orange-600/20", hex: "#f97316" },
-  transport: { chip: "bg-sky-50 text-sky-700 ring-sky-600/20", hex: "#0ea5e9" },
-  shopping: { chip: "bg-violet-50 text-violet-700 ring-violet-600/20", hex: "#8b5cf6" },
-  entertainment: { chip: "bg-pink-50 text-pink-700 ring-pink-600/20", hex: "#ec4899" },
-  subscriptions: { chip: "bg-indigo-50 text-indigo-700 ring-indigo-600/20", hex: "#6366f1" },
-  utilities: { chip: "bg-amber-50 text-amber-700 ring-amber-600/20", hex: "#f59e0b" },
-  health: { chip: "bg-rose-50 text-rose-700 ring-rose-600/20", hex: "#f43f5e" },
-  education: { chip: "bg-teal-50 text-teal-700 ring-teal-600/20", hex: "#14b8a6" },
-  other: { chip: "bg-neutral-100 text-neutral-700 ring-neutral-500/20", hex: "#737373" },
+  groceries: { chip: "bg-emerald-50 text-emerald-700 ring-emerald-600/20", hex: "#a9b89a" },
+  dining: { chip: "bg-orange-50 text-orange-700 ring-orange-600/20", hex: "#e9a27f" },
+  transport: { chip: "bg-sky-50 text-sky-700 ring-sky-600/20", hex: "#8fc1d9" },
+  shopping: { chip: "bg-violet-50 text-violet-700 ring-violet-600/20", hex: "#a9a7f5" },
+  entertainment: { chip: "bg-pink-50 text-pink-700 ring-pink-600/20", hex: "#e8a1b8" },
+  subscriptions: { chip: "bg-indigo-50 text-indigo-700 ring-indigo-600/20", hex: "#4a4a4a" },
+  utilities: { chip: "bg-amber-50 text-amber-700 ring-amber-600/20", hex: "#f2cf6f" },
+  health: { chip: "bg-rose-50 text-rose-700 ring-rose-600/20", hex: "#d98880" },
+  education: { chip: "bg-teal-50 text-teal-700 ring-teal-600/20", hex: "#86c2b4" },
+  other: { chip: "bg-neutral-100 text-neutral-700 ring-neutral-500/20", hex: "#c9c3b5" },
 };

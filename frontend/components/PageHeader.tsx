@@ -11,8 +11,8 @@ export default function PageHeader({
   return (
     <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">{title}</h1>
-        {subtitle && <p className="mt-1 text-sm text-neutral-500">{subtitle}</p>}
+        <h1 className="text-xl font-semibold text-foreground">{title}</h1>
+        {subtitle && <p className="mt-1 text-sm text-muted">{subtitle}</p>}
       </div>
       {children}
     </header>

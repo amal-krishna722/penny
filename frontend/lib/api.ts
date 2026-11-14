@@ -24,12 +24,12 @@ import mockReceipt from "@/mocks/receipt.json";
 // flip its flag to false. Everything else keeps using the fake data.
 // ---------------------------------------------------------------------------
 const MOCK = {
-  transactions: true, // GET /transactions   (Person A, A4)
-  summary: true, // GET /summary        (Person A, A6)
-  account: true, // GET /bank/account   (Person B, B3)
-  subscriptions: true, // GET /subscriptions  (Person B, B5)
-  ask: true, // POST /ask           (Person B, B6)
-  receipt: true, // POST /receipt       (Person A, A2)
+  transactions: false, // GET /transactions   (Person A, A4) live
+  summary: true, // GET /summary        (Person A, A6) not built yet
+  account: false, // GET /bank/account   (Person B, B3) live
+  subscriptions: true, // GET /subscriptions  (Person B, B5) not built yet
+  ask: true, // POST /ask           (Person B, B6) not built yet
+  receipt: false, // POST /receipt       (Person A, A2) live
 };
 
 /** True while an endpoint still returns fake data, so pages can say so. */

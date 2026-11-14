@@ -146,13 +146,13 @@ You own `backend/app/bank/`, `backend/app/insights/`, `backend/scripts/`, `backe
 - **Done when:** merged to `main` and A and C have pulled it.
 
 ### B1. Nessie client (target 12:30 PM)
-- [ ] **File:** `backend/app/bank/nessie.py`
+- [x] **File:** `backend/app/bank/nessie.py`
 - **Build:** small functions that each wrap one Nessie API call: create customer, create account, create merchant, create purchase, list purchases for an account, get account. Read the key from `app.config`. **Check paths and field names against the Nessie docs first.**
 - **Test:** call each one from a Python shell.
 - **Done when:** you can create a purchase and read it back.
 
 ### B2. Seed script (target 1:30 PM)
-- [ ] **File:** `backend/scripts/seed_nessie.py`
+- [x] **File:** `backend/scripts/seed_nessie.py`
 - **Build:** creates `Demo Student`, one checking account (about $2,450) and **60 days** of purchases (about 50 to 70):
   - Subscriptions on the same day each month: Netflix $15.49, Spotify $11.99, Planet Fitness $24.99, iCloud $2.99
   - Groceries weekly (Stop & Shop, Big Y), dining (Chipotle, Starbucks, local spots), shopping (Amazon, Target), transport (Uber), one big Best Buy purchase of $389.99
@@ -175,12 +175,12 @@ You own `backend/app/bank/`, `backend/app/insights/`, `backend/scripts/`, `backe
 - **Done when:** running it once gives a full 60 days of data in Nessie.
 
 ### B3. Sync and account (target 2:30 PM)
-- [ ] **File:** `backend/app/bank/router.py`
+- [x] **File:** `backend/app/bank/router.py`
 - **Build:** `sync_from_nessie()` (signature in SPEC section 5), `POST /bank/sync`, `GET /bank/account`. Upsert by `nessie_id` so running sync twice creates no duplicates. At the end, call `match_receipt` for every unmatched receipt.
 - **Done when:** `transactions` in Atlas has every Nessie purchase, and syncing twice doesn't change the count.
 
 ### B4. Real matching (target 4:00 PM)
-- [ ] **Files:** `backend/app/bank/matching.py`, `backend/tests/test_matching.py`
+- [x] **Files:** `backend/app/bank/matching.py`, `backend/tests/test_matching.py`
 - **Build:** replace the stub. No LLM.
   1. **Candidates:** unmatched transactions within ±2 days of the receipt date.
   2. **Amount must pass one:** exact (difference ≤ $0.01), or for `dining` only, transaction between the receipt total and 1.30× the total (tip).

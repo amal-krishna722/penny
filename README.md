@@ -1,6 +1,6 @@
-# Itemize
+# Penny
 
-Your bank statement says `AMAZON $84.12`. That one line was actually $60 of groceries and a $24 phone case. Itemize reads your receipts and fills in what the bank leaves out, including the cash purchases it never sees at all.
+Your bank statement says `AMAZON $84.12`. That one line was actually $60 of groceries and a $24 phone case. Penny reads your receipts and fills in what the bank leaves out, including the cash purchases it never sees at all.
 
 Built at HackUMass XIV.
 

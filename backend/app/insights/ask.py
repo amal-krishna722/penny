@@ -150,7 +150,7 @@ def run_tool(name: str, args: dict):
 
 # ---------- The question-and-answer loop ----------
 
-SYSTEM_PROMPT = """You answer questions about the user's own spending in the Itemize app.
+SYSTEM_PROMPT = """You answer questions about the user's own spending in the Penny app.
 Today is {today}. "This month" means {month_start} to {today}.
 Rules:
 - If the question doesn't say a time range, use this month and say "this month".

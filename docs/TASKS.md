@@ -1,4 +1,4 @@
-# Itemize: TASKS
+# Penny: TASKS
 
 Who builds what, in what order. Each task says which files to touch, how to test it and when it counts as done. Work top to bottom. Check a box when the task is merged into `main`.
 

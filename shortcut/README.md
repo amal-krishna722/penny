@@ -1,6 +1,6 @@
-# Itemize iPhone Shortcut
+# Penny iPhone Shortcut
 
-Double-tap the back of your iPhone, photograph a receipt, and it's added to Itemize.
+Double-tap the back of your iPhone, photograph a receipt, and it's added to Penny.
 
 ## Install
 1. On your iPhone, open the iCloud link: **<ICLOUD_SHARE_LINK_GOES_HERE>**
@@ -20,7 +20,7 @@ Double-tap the back of your iPhone, photograph a receipt, and it's added to Item
 6. **Show Notification** → Dictionary Value
 
 ## Back Tap
-Settings → Accessibility → Touch → Back Tap → Double Tap → **Itemize**
+Settings → Accessibility → Touch → Back Tap → Double Tap → **Penny**
 
 ## Sharing it safely
 A shared Shortcut contains everything in it, including headers. Before creating an iCloud link:

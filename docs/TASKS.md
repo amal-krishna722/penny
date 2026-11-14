@@ -197,7 +197,7 @@ You own `backend/app/bank/`, `backend/app/insights/`, `backend/scripts/`, `backe
 - **Done when:** exactly the 4 seeded subscriptions come back.
 
 ### B6. Ask AI (target 7:00 PM)
-- [ ] **Files:** `backend/app/insights/ask.py`, `backend/app/insights/router.py`
+- [x] **Files:** `backend/app/insights/ask.py`, `backend/app/insights/router.py`
 - **Build:** `POST /ask` with Gemini **function calling**. Each tool is a Python function that queries MongoDB and returns JSON:
 
   | Tool | Arguments | Returns |

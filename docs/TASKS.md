@@ -122,7 +122,7 @@ You own `backend/app/receipts/`, `backend/app/dashboard/` and `shortcut/`.
 - **Done when:** a double tap on a receipt shows the summary notification and the receipt appears in `/transactions`.
 
 ### A6. Summary and demo reset (target 6:00 PM)
-- [ ] **Files:** `backend/app/dashboard/summary.py`, `backend/app/dashboard/router.py`
+- [x] **Files:** `backend/app/dashboard/summary.py`, `backend/app/dashboard/router.py`
 - **Build:** `GET /summary` exactly as in SPEC section 4. Compute everything in Python from the feed. Then `POST /demo/reset` (delete receipts, clear match fields, call Person B's `sync_from_nessie()`).
 - **Done when:** the numbers add up by hand for a small date range.
 

@@ -40,7 +40,7 @@ class Receipt(BaseModel):
 
 
 class Transaction(BaseModel):
-    """MongoDB collection `transactions` (Person B, copied from Nessie)."""
+    """MongoDB collection `transactions` (built by Amal, Person B, from Nessie)."""
     id: str
     user_id: str = "demo"
     nessie_id: str

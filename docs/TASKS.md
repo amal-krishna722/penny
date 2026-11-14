@@ -159,14 +159,18 @@ You own `backend/app/bank/`, `backend/app/insights/`, `backend/scripts/`, `backe
   - Plus the 4 **demo receipt** purchases below
   - Prints the customer and account IDs to paste into `.env`
   - Keeps a merchant → category lookup table (used for transactions without receipts)
-- **Demo receipts** (agree with the team, then A prints or screenshots them):
+- **Demo receipts** (agreed; images in `docs/demo-receipts/`, all dated 2026-11-14). Seed these charges **exactly**:
 
-  | Receipt | Seeded bank charge | Shows off |
-  |---|---|---|
-  | Amazon: groceries $60.12 + phone case $24.00 = $84.12 | `AMAZON MKTPLACE` $84.12, same day | one charge, two categories |
-  | Chipotle $23.40 | `CHIPOTLE 2741 AMHERST` $27.40, same day | tip and messy merchant name |
-  | Stop & Shop $47.85, 8 items | `STOP & SHOP #0412` $47.85, next day | posting delay |
-  | Food truck $12.00 | none | cash purchase |
+  | Receipt | Seeded bank charge | Date | Shows off |
+  |---|---|---|---|
+  | `amazon.png`: groceries $60.12 + phone case $22.59 + tax $1.41 = **$84.12** | `AMAZON MKTPLACE` $84.12 | 2026-11-14 | one charge, two categories |
+  | `chipotle.png`: **$23.40** (tip line left blank) | `CHIPOTLE 2741 AMHERST` $27.40 | 2026-11-14 | $4 tip and messy merchant name |
+  | `stop-and-shop.png`: 8 items, **$47.85** | `STOP & SHOP #0412` $47.85 | 2026-11-15 | posts a day late |
+  | `taco-truck-cash.png`: El Guero Taco Truck **$12.00**, paid cash | none | | cash purchase |
+
+  - Use `AMAZON MKTPLACE`, not `AMZN Mktp US` ("amzn" fuzzy-matches "amazon" badly).
+  - Seed no taco or food-truck-like charge between 11/12 and 11/16, so the cash receipt can't match anything.
+  - **A:** run all 4 images through Gemini (A1) early. Check Chipotle reads as $23.40 despite the blank TIP/TOTAL lines.
 
 - **Done when:** running it once gives a full 60 days of data in Nessie.
 

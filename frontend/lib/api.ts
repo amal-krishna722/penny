@@ -32,6 +32,11 @@ const MOCK = {
   receipt: true, // POST /receipt       (Person A, A2)
 };
 
+/** True while an endpoint still returns fake data, so pages can say so. */
+export function isMocked(endpoint: keyof typeof MOCK): boolean {
+  return MOCK[endpoint];
+}
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 const API_SECRET = process.env.NEXT_PUBLIC_API_SECRET ?? "";
 

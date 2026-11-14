@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import PageHeader from "@/components/PageHeader";
 import { CategoryChip } from "@/components/TransactionRow";
-import { uploadReceipt } from "@/lib/api";
+import { isMocked, uploadReceipt } from "@/lib/api";
 import { longDate, money } from "@/lib/format";
 import type { ReceiptResponse } from "@/lib/types";
 
@@ -198,6 +198,12 @@ function ResultCard({ result, onReset }: { result: ReceiptResponse; onReset: () 
       {/* The same one-line summary the Shortcut shows as a notification */}
       <div className="rounded-xl bg-emerald-50 px-5 py-4 text-emerald-900 ring-1 ring-emerald-600/20">
         <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Itemized</p>
+        {/* While mocks are on, every upload returns the same fake receipt. Say so. */}
+        {isMocked("receipt") && (
+          <p className="mt-1 text-xs text-amber-700">
+            Sample data: the backend isn&apos;t connected yet, so this isn&apos;t your receipt.
+          </p>
+        )}
         <p className="mt-1 font-medium">{result.summary}</p>
       </div>
 

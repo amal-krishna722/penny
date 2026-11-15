@@ -30,7 +30,7 @@ Opening the bare base URL shows `{"detail":"Not Found"}`. That is expected: ther
 | Public IP | `45.77.216.120` |
 | Extras | none (Automatic Backups, DDoS protection, VPC all off) |
 | Cost | $5.00/mo (about $0.007/hr), drawn from MLH credit |
-| Login | `ssh root@45.77.216.120` (root password is on the Vultr instance page, never commit it) |
+| Login | `ssh root@45.77.216.120`, SSH key only (password login is off). Only Amal's laptop has a key; to get access, send Amal your public key (`~/.ssh/id_ed25519.pub`). Emergency access: Vultr → instance → View Console. |
 
 **Billing reminder:** the MLH credit expires 30 days after signup. **Destroy the instance** (Vultr → Compute → Instances → penny-api → Destroy) before then. Stopping it is not enough; stopped servers still bill.
 

@@ -6,9 +6,9 @@ import { useEffect, useRef, useState } from "react";
 import PageHeader from "@/components/PageHeader";
 import { EmptyState, Notice } from "@/components/ui";
 import TransactionRow from "@/components/TransactionRow";
-import { getTransactions } from "@/lib/api";
+import { getReceipts, getTransactions } from "@/lib/api";
 import { categoryLabel, longDate, money } from "@/lib/format";
-import { CATEGORIES, type Category, type FeedEntry } from "@/lib/types";
+import { CATEGORIES, type Category, type FeedEntry, type Receipt } from "@/lib/types";
 
 const POLL_MS = 3000; // how often to re-fetch, so a Back Tap receipt shows up live
 const FRESH_MS = 4000; // how long a newly arrived row stays highlighted
@@ -21,6 +21,8 @@ export default function TransactionsPage() {
 
   const [rows, setRows] = useState<FeedEntry[] | null>(null); // null = first load still running
   const [error, setError] = useState<string | null>(null);
+  // Receipts by id, for the "How Penny matched this" panel in expanded rows.
+  const [receipts, setReceipts] = useState<Map<string, Receipt>>(new Map());
 
   // Expanded rows are tracked by id, not by position, so they stay open
   // when a poll brings in new rows above them.
@@ -38,7 +40,11 @@ export default function TransactionsPage() {
 
     async function load() {
       try {
-        const data = await getTransactions({ category: category || undefined, type: type || undefined });
+        // Both requests run at the same time; we wait for both.
+        const [data, receiptList] = await Promise.all([
+          getTransactions({ category: category || undefined, type: type || undefined }),
+          getReceipts(),
+        ]);
         if (stopped) return; // the page or filters changed while we waited
 
         // After the first load, anything we haven't seen before is new.
@@ -55,6 +61,7 @@ export default function TransactionsPage() {
         }
 
         setRows(data);
+        setReceipts(new Map(receiptList.map((r) => [r.id, r])));
         setError(null);
       } catch (e) {
         if (!stopped) setError(e instanceof Error ? e.message : String(e));
@@ -152,6 +159,7 @@ export default function TransactionsPage() {
                   <TransactionRow
                     key={entry.id}
                     entry={entry}
+                    receipt={entry.receipt_id ? receipts.get(entry.receipt_id) : undefined}
                     expanded={expanded.has(entry.id)}
                     fresh={freshIds.has(entry.id)}
                     onToggle={() => toggle(entry.id)}

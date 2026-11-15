@@ -12,6 +12,7 @@ import { LogoMark } from "@/components/Logo";
 import PageHeader from "@/components/PageHeader";
 import { Notice } from "@/components/ui";
 import { ask, isMocked, SUGGESTED_QUESTIONS } from "@/lib/api";
+import { shortDate } from "@/lib/format";
 import type { ToolCall } from "@/lib/types";
 
 // One bubble in the chat. Answers carry the tools used, errors are styled red.
@@ -181,22 +182,41 @@ function Bubble({ message }: { message: Message }) {
   );
 }
 
-// A small chip with the tool name. Hovering shows the arguments Gemini chose,
-// e.g. category=groceries, start=2026-11-01.
+// A chip per database query Gemini ran: the tool name plus, in plain words,
+// what it asked for (e.g. "get_spending · groceries + dining · Nov 1 – Nov 14").
+// This is the proof the answer came from a real query. Hovering shows the raw arguments.
 function ToolChip({ tool }: { tool: ToolCall }) {
-  const args = Object.entries(tool.args)
+  const raw = Object.entries(tool.args)
     .map(([k, v]) => `${k}=${typeof v === "string" ? v : JSON.stringify(v)}`)
     .join(", ");
+  const parts = describeArgs(tool.args);
   return (
-    <span
-      title={args || "no arguments"}
-      className="pill bg-accent-soft font-mono font-medium text-accent-ink"
-    >
+    <span title={raw || "no arguments"} className="pill bg-accent-soft font-medium text-accent-ink">
       <Wrench size={11} aria-hidden="true" />
-      {tool.name}
-      {args && <span className="hidden font-normal sm:inline">({args})</span>}
+      <span className="font-mono">{tool.name}</span>
+      {parts.map((p) => (
+        <span key={p} className="font-normal">
+          · {p}
+        </span>
+      ))}
     </span>
   );
+}
+
+// Turns the arguments of the backend tools (backend/app/insights/ask.py) into short phrases.
+// Unknown arguments are skipped here but still visible on hover.
+function describeArgs(args: Record<string, unknown>): string[] {
+  const out: string[] = [];
+  const start = typeof args.start === "string" ? args.start : null;
+  const end = typeof args.end === "string" ? args.end : null;
+  if (typeof args.query === "string") out.push(`“${args.query}”`);
+  if (Array.isArray(args.categories) && args.categories.length > 0) out.push(args.categories.join(" + "));
+  if (args.type === "card" || args.type === "cash") out.push(`${args.type} only`);
+  if (typeof args.n === "number") out.push(`top ${args.n}`);
+  if (start && end) out.push(start === end ? shortDate(start) : `${shortDate(start)} – ${shortDate(end)}`);
+  else if (start) out.push(`from ${shortDate(start)}`);
+  else if (end) out.push(`until ${shortDate(end)}`);
+  return out;
 }
 
 function Dot({ delay }: { delay: string }) {

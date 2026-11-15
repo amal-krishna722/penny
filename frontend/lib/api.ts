@@ -6,6 +6,7 @@ import type {
   AskResponse,
   DateRange,
   FeedEntry,
+  Receipt,
   ReceiptResponse,
   Summary,
   SubscriptionsResponse,
@@ -156,6 +157,12 @@ export function ask(question: string): Promise<AskResponse> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ question }),
   });
+}
+
+/** GET /receipts: every scanned receipt, with its match details (confidence, linked charge). */
+export function getReceipts(): Promise<Receipt[]> {
+  if (MOCK.receipt) return fake([(mockReceipt as ReceiptResponse).receipt]);
+  return request("/receipts");
 }
 
 /** POST /receipt?source=web_upload: the backup upload from the browser. */

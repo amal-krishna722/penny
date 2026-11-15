@@ -1,4 +1,5 @@
-// Insights page (task C5). Uses GET /subscriptions.
+// Insights page (task C5). Uses GET /subscriptions, plus GET /transactions
+// for the evidence behind each subscription.
 // Shows the monthly total of recurring charges at the top and one card per
 // subscription, soonest renewal first. Add more sections here only if the
 // backend adds endpoints for them.
@@ -6,21 +7,30 @@
 
 import { useEffect, useState } from "react";
 import PageHeader from "@/components/PageHeader";
+import SubscriptionEvidence, { chargesFor } from "@/components/SubscriptionEvidence";
 import { Amount, EmptyState, Notice } from "@/components/ui";
-import { getSubscriptions, isMocked } from "@/lib/api";
+import { getSubscriptions, getTransactions, isMocked } from "@/lib/api";
 import { daysUntil, shortDate } from "@/lib/format";
-import type { Subscription, SubscriptionsResponse } from "@/lib/types";
+import type { FeedEntry, Subscription, SubscriptionsResponse } from "@/lib/types";
 
 export default function InsightsPage() {
   const [data, setData] = useState<SubscriptionsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [feed, setFeed] = useState<FeedEntry[]>([]); // for "Why is this a subscription?"
 
   // Subscriptions only change when the bank syncs, so one load is enough
   // (no polling like the Overview page).
   useEffect(() => {
     let stopped = false;
     getSubscriptions()
-      .then((d) => !stopped && setData(d))
+      .then((d) => {
+        if (stopped) return;
+        setData(d);
+        // Only after /subscriptions: that call is what refreshes the
+        // is_subscription flags on the server. If this fails, the cards
+        // still show, just without the evidence.
+        return getTransactions().then((f) => !stopped && setFeed(f));
+      })
       .catch((e) => !stopped && setError(String(e?.message ?? e)));
     return () => {
       stopped = true;
@@ -72,9 +82,9 @@ export default function InsightsPage() {
                 </EmptyState>
               </div>
             ) : (
-              <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              <ul className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {subs.map((s) => (
-                  <SubscriptionCard key={s.merchant} sub={s} totalMonthly={data.total_monthly} />
+                  <SubscriptionCard key={s.merchant} sub={s} totalMonthly={data.total_monthly} charges={chargesFor(s, feed)} />
                 ))}
               </ul>
             )}
@@ -85,7 +95,15 @@ export default function InsightsPage() {
   );
 }
 
-function SubscriptionCard({ sub, totalMonthly }: { sub: Subscription; totalMonthly: number }) {
+function SubscriptionCard({
+  sub,
+  totalMonthly,
+  charges,
+}: {
+  sub: Subscription;
+  totalMonthly: number;
+  charges: FeedEntry[];
+}) {
   // This subscription's share of the monthly total, for the small bar.
   const share = totalMonthly > 0 ? (sub.amount / totalMonthly) * 100 : 0;
   const days = daysUntil(sub.next_expected);
@@ -125,6 +143,8 @@ function SubscriptionCard({ sub, totalMonthly }: { sub: Subscription; totalMonth
           </dd>
         </div>
       </dl>
+
+      <SubscriptionEvidence charges={charges} />
     </li>
   );
 }

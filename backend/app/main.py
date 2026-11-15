@@ -8,7 +8,7 @@ from app.dashboard.router import router as dashboard_router  # Person A
 from app.bank.router import router as bank_router            # Amal (Person B)
 from app.insights.router import router as insights_router    # Amal (Person B)
 
-app = FastAPI(title="Itemize API")
+app = FastAPI(title="Penny API")
 
 # CORS: lets the frontend (localhost:3000) call this API from the browser.
 app.add_middleware(CORSMiddleware, allow_origins=[FRONTEND_URL], allow_methods=["*"], allow_headers=["*"])

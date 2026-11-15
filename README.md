@@ -1,6 +1,8 @@
-# Itemize
+# Penny
 
-Your bank statement says `AMAZON $84.12`. That one line was actually $60 of groceries and a $24 phone case. Itemize reads your receipts and fills in what the bank leaves out, including the cash purchases it never sees at all.
+**P**hoto **E**nabled **N**etwork, **N**eatly **Y**ours.
+
+Your bank statement says `AMAZON $84.12`. That one line was actually $60 of groceries and a $24 phone case. Penny reads your receipts and fills in what the bank leaves out, including the cash purchases it never sees at all.
 
 Built at HackUMass XIV.
 
@@ -47,3 +49,7 @@ npm run dev
 ```
 
 Then open http://localhost:3000. The API contract between the backend and frontend is in [docs/SPEC.md](docs/SPEC.md).
+
+## Deployment
+
+The backend runs on a Vultr server behind Caddy for HTTPS: https://45-77-216-120.sslip.io/docs. How it's set up and updated is in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).

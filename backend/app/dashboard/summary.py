@@ -4,9 +4,32 @@
 from collections import defaultdict
 from datetime import date, timedelta
 
+from app.bank.matching import LOCAL_CITIES, normalize
 from app.dashboard.feed import get_feed
 
 TOP_MERCHANTS = 5
+
+
+def merchant_key(name: str) -> str:
+    """The grouping key for one store, however it was written.
+    "Stop & Shop" and "STOP & SHOP #0412" -> "stop shop". Uses the same cleaning as matching.
+    Anything that groups by merchant (top merchants, Ask AI) should group by this key."""
+    return normalize(name) or name.strip().lower()
+
+
+def merchant_label(names: list[str]) -> str:
+    """Pick the name to show for a merchant group. A receipt name ("Stop & Shop") reads nicer
+    than a bank name ("STOP & SHOP #0412"), so prefer names that aren't all caps, then the most common."""
+    def score(n: str) -> tuple:
+        return (not n.isupper(), names.count(n), -len(n))
+    best = max(names, key=score)
+    if not best.isupper():
+        return best
+    # Only bank names: "STOP & SHOP #0412" -> "Stop & Shop", "CHIPOTLE 2741 AMHERST" -> "Chipotle"
+    words = [w for w in best.split() if not any(ch.isdigit() for ch in w)]
+    if len(words) > 1 and words[-1].lower() in LOCAL_CITIES:
+        words = words[:-1]
+    return " ".join(words).title() or best
 
 
 def _pct(part: float, whole: float) -> float:
@@ -23,12 +46,17 @@ def build_summary(feed: list[dict], start: str, end: str) -> dict:
 
     by_cat = defaultdict(float)
     by_day = defaultdict(float)
-    by_merchant = defaultdict(lambda: {"amount": 0.0, "count": 0})
+    by_merchant = defaultdict(lambda: {"amount": 0.0, "count": 0, "names": []})
     for e in feed:
         by_cat[e["category"]] += e["amount"]
         by_day[e["date"]] += e["amount"]
-        by_merchant[e["merchant"]]["amount"] += e["amount"]
-        by_merchant[e["merchant"]]["count"] += 1
+        # Group by the bank name when there is one: "Chipotle Mexican Grill" (receipt) and
+        # "CHIPOTLE 2741 AMHERST" (bank) clean to different keys, but every Chipotle charge
+        # has the same bank name. The receipt name still goes into names, so it's the label.
+        group = by_merchant[merchant_key(e.get("bank_merchant") or e["merchant"])]
+        group["amount"] += e["amount"]
+        group["count"] += 1
+        group["names"].append(e["merchant"])
 
     # One entry for every day in the range, 0 for days with no spending (SPEC).
     daily = []
@@ -53,8 +81,8 @@ def build_summary(feed: list[dict], start: str, end: str) -> dict:
         ],
         "daily": daily,
         "top_merchants": [
-            {"merchant": m, "amount": round(v["amount"], 2), "count": v["count"]}
-            for m, v in merchants[:TOP_MERCHANTS]
+            {"merchant": merchant_label(v["names"]), "amount": round(v["amount"], 2), "count": v["count"]}
+            for _, v in merchants[:TOP_MERCHANTS]
         ],
     }
 

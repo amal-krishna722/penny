@@ -27,6 +27,9 @@ def build_feed(receipt_docs: list[dict], transaction_docs: list[dict]) -> list[d
             "receipt_id": r["id"] if r else None,
             "transaction_id": t["id"],
             "is_subscription": t.get("is_subscription", False),
+            # Internal only (not in FeedEntry, so /transactions drops it): the bank's name,
+            # which groups the same store even when the receipt name cleans differently.
+            "bank_merchant": t["merchant"],
         })
 
     # 2. Receipts not attached to any transaction are cash purchases.
@@ -43,6 +46,7 @@ def build_feed(receipt_docs: list[dict], transaction_docs: list[dict]) -> list[d
             "items": r.get("items", []),
             "receipt_id": r["id"],
             "transaction_id": None,
+            "bank_merchant": None,
             "is_subscription": False,
         })
     return feed

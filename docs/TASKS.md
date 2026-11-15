@@ -1,4 +1,4 @@
-# Itemize: TASKS
+# Penny: TASKS
 
 Who builds what, in what order. Each task says which files to touch, how to test it and when it counts as done. Work top to bottom. Check a box when the task is merged into `main`.
 
@@ -127,7 +127,7 @@ You own `backend/app/receipts/`, `backend/app/dashboard/` and `shortcut/`.
 - **Done when:** the numbers add up by hand for a small date range.
 
 ### A7. After freeze
-- [ ] Deploy the backend to Vultr if there's time (Vultr prize), otherwise keep ngrok running on one laptop.
+- [x] Deploy the backend to Vultr (done by Amal: https://45-77-216-120.sslip.io, see docs/DEPLOYMENT.md).
 - [x] Print or screenshot the 4 demo receipts (listed in Person B's task B2).
 - [x] Own the Devpost write-up draft.
 
@@ -197,7 +197,7 @@ You own `backend/app/bank/`, `backend/app/insights/`, `backend/scripts/`, `backe
 - **Done when:** exactly the 4 seeded subscriptions come back.
 
 ### B6. Ask AI (target 7:00 PM)
-- [ ] **Files:** `backend/app/insights/ask.py`, `backend/app/insights/router.py`
+- [x] **Files:** `backend/app/insights/ask.py`, `backend/app/insights/router.py`
 - **Build:** `POST /ask` with Gemini **function calling**. Each tool is a Python function that queries MongoDB and returns JSON:
 
   | Tool | Arguments | Returns |

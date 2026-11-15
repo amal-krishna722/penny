@@ -1,4 +1,4 @@
-# Itemize: SPEC
+# Penny: SPEC
 
 This file is the **contract**. It says what data looks like and which endpoints exist. It does not say how to build them (that is `docs/TASKS.md`).
 

@@ -42,7 +42,7 @@ def get_top_merchants(n: int, start: str, end: str) -> list[dict]:
     # exactly like top_merchants in /summary.
     totals = defaultdict(lambda: {"amount": 0.0, "count": 0, "names": []})
     for e in get_feed(start=start, end=end):
-        group = totals[merchant_key(e["merchant"])]
+        group = totals[merchant_key(e.get("bank_merchant") or e["merchant"])]
         group["amount"] += e["amount"]
         group["count"] += 1
         group["names"].append(e["merchant"])

@@ -8,6 +8,7 @@ How the Penny backend is hosted, how to update it and how to fix it when somethi
 
 | What | URL |
 |---|---|
+| **Live app (frontend on Vercel)** | `https://penny-chi-one.vercel.app` |
 | **API base URL** | `https://45-77-216-120.sslip.io` |
 | Health check | `https://45-77-216-120.sslip.io/health` → `{"ok":true}` |
 | Interactive API docs | `https://45-77-216-120.sslip.io/docs` |
@@ -96,7 +97,7 @@ Open: `22` (SSH), `80` and `443` (Caddy). Port `8000` was opened for the first t
 ### Environment variables in the server `.env`
 `GEMINI_API_KEY`, `NESSIE_API_KEY`, `NESSIE_CUSTOMER_ID`, `NESSIE_ACCOUNT_ID`, `MONGODB_URI`, `API_SECRET`, `FRONTEND_URL`
 
-`FRONTEND_URL` is currently `http://localhost:3000`. The server and every laptop share the same MongoDB Atlas database, so data seeded or synced locally also shows up on the live API.
+`FRONTEND_URL` is a comma-separated list of the frontends allowed to call the API (CORS): currently `http://localhost:3000,https://penny-chi-one.vercel.app`. The server and every laptop share the same MongoDB Atlas database, so data seeded or synced locally also shows up on the live API.
 
 ---
 
@@ -136,13 +137,29 @@ If `.env` gets a new variable, also run `nano /root/penny/backend/.env`, add it 
 |---|---|
 | `systemctl status penny` says **failed** | Read `journalctl -u penny -n 50`. Usually a missing `.env` key, a missing package (run `pip install -r requirements.txt`) or a Python error in newly pulled code. |
 | HTTPS page does not load | Check `journalctl -u caddy -n 50`. Make sure ports 80 and 443 are open (`ufw status`). |
-| Frontend shows a **CORS error** | `FRONTEND_URL` in the server `.env` must exactly match the frontend's origin (for example `https://penny.vercel.app`, no trailing slash). Edit it, then `systemctl restart penny`. `main.py` currently allows only one origin; supporting several (localhost and Vercel) needs a small change to `main.py`, which is a shared file, so tell the team first. |
+| Frontend shows **"Failed to fetch"** or a CORS error | The frontend's address must be listed in `FRONTEND_URL` in the server `.env` (comma-separated, e.g. `http://localhost:3000,https://penny-chi-one.vercel.app`). Add it, then `systemctl restart penny`. |
 | Shortcut gets `401` | The `X-API-Key` header doesn't match `API_SECRET` in the server `.env`. |
 | `git pull` asks for a password | Use a GitHub fine-grained token with Contents: Read-only on the `penny` repo as the password. |
 | Bare URL shows `Not Found` | Normal. Use `/health` or `/docs`. Optional: add a redirect from `/` to `/docs` in `main.py` (shared file, ask first). |
 
 ---
 
-## 8. For the Devpost write-up (Best Use of Vultr)
+## 8. The frontend on Vercel
 
-The FastAPI backend runs on a Vultr Cloud Compute instance (Ubuntu 24.04, New York) as a systemd service, behind Caddy for automatic HTTPS. The iPhone Shortcut and the Next.js dashboard both talk to this single public endpoint, and it connects to MongoDB Atlas, Gemini and Capital One's Nessie API.
+| Setting | Value |
+|---|---|
+| URL | `https://penny-chi-one.vercel.app` |
+| Project | imported from the `amal-krishna722/penny` GitHub repo |
+| Root Directory | `frontend` |
+| Environment variables | `NEXT_PUBLIC_API_URL=https://45-77-216-120.sslip.io`, `NEXT_PUBLIC_API_SECRET` (same value as `API_SECRET`) |
+
+- **Vercel redeploys by itself** on every push to `main`. Frontend changes go live in a minute or two; nothing to do on the server.
+- **Backend changes still need section 5** (pull and restart on the Vultr server).
+- If the Vercel URL ever changes, add the new one to `FRONTEND_URL` on the server and restart, or the site shows "Failed to fetch".
+- Changing a `NEXT_PUBLIC_` variable in Vercel needs a **redeploy** (Deployments, then Redeploy) to take effect.
+
+---
+
+## 9. For the Devpost write-up (Best Use of Vultr)
+
+The FastAPI backend runs on a Vultr Cloud Compute instance (Ubuntu 24.04, New York) as a systemd service, behind Caddy for automatic HTTPS. The iPhone Shortcut and the Next.js dashboard (deployed on Vercel) both talk to this single public endpoint, and it connects to MongoDB Atlas, Gemini and Capital One's Nessie API.

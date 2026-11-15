@@ -11,10 +11,12 @@ from app.config import GEMINI_API_KEY
 # Models to try, in order. If one is overloaded we fall back to the next, so a
 # busy Gemini model doesn't break the demo. (3.7/3.8 were timing out in testing;
 # 2.5 is retired.) The "lite" models are less accurate but rarely overloaded.
-MODELS = ["gemini-3.5-flash", "gemini-3.6-flash", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite"]
+# Demo day: 3.5-flash with thinking off reads a receipt in ~3 s (13+ s with thinking on),
+# so it goes first. The others are backups.
+MODELS = ["gemini-3.5-flash", "gemini-3.5-flash-lite", "gemini-3.6-flash", "gemini-3.1-flash-lite"]
 
-# Give up on a model after 20 s and try the next one, instead of hanging forever.
-TIMEOUT_MS = 20_000
+# Give up on a model after 12 s and try the next one, instead of hanging forever.
+TIMEOUT_MS = 12_000
 
 # Error codes that mean "busy, try again": 429 rate limit, 500/503/504 server-side.
 RETRYABLE_CODES = {429, 500, 503, 504}
@@ -70,22 +72,38 @@ def _category(value) -> str:
     return value if value in CATEGORIES else "other"
 
 
+def _generate(model: str, image_bytes: bytes, mime_type: str, thinking: bool):
+    """One Gemini request. Reading a receipt needs no "thinking" step, and skipping it
+    is about 5x faster, so we switch it off where the model allows."""
+    config = types.GenerateContentConfig(
+        response_mime_type="application/json",  # raw JSON, no ```json fences
+        thinking_config=None if thinking else types.ThinkingConfig(thinking_budget=0),
+    )
+    return _get_client().models.generate_content(
+        model=model,
+        contents=[types.Part.from_bytes(data=image_bytes, mime_type=mime_type), PROMPT],
+        config=config,
+    )
+
+
 def _call_gemini(image_bytes: bytes, mime_type: str):
     """Try each model in MODELS until one answers. Busy errors and timeouts
     move on to the next model; other errors (bad key, bad image) raise immediately."""
     last_error = None
     for model in MODELS:
         try:
-            return _get_client().models.generate_content(
-                model=model,
-                contents=[
-                    types.Part.from_bytes(data=image_bytes, mime_type=mime_type),
-                    PROMPT,
-                ],
-                # Forces Gemini to answer with raw JSON (no ```json fences).
-                config=types.GenerateContentConfig(response_mime_type="application/json"),
-            )
+            return _generate(model, image_bytes, mime_type, thinking=False)
         except errors.APIError as e:
+            if e.code == 400:
+                # This model can't switch thinking off (the lite ones): ask again the normal way.
+                try:
+                    return _generate(model, image_bytes, mime_type, thinking=True)
+                except (errors.APIError, httpx2.TimeoutException) as e2:
+                    e = e2
+            if not isinstance(e, errors.APIError):
+                last_error = e
+                print(f"Gemini {model} timed out, trying next model")
+                continue
             if e.code not in RETRYABLE_CODES:
                 raise
             last_error = e

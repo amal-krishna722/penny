@@ -127,7 +127,7 @@ You own `backend/app/receipts/`, `backend/app/dashboard/` and `shortcut/`.
 - **Done when:** the numbers add up by hand for a small date range.
 
 ### A7. After freeze
-- [ ] Deploy the backend to Vultr if there's time (Vultr prize), otherwise keep ngrok running on one laptop.
+- [x] Deploy the backend to Vultr (done by Amal: https://45-77-216-120.sslip.io, see docs/DEPLOYMENT.md).
 - [x] Print or screenshot the 4 demo receipts (listed in Person B's task B2).
 - [x] Own the Devpost write-up draft.
 

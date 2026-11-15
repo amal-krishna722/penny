@@ -8,7 +8,7 @@ import httpx2  # the HTTP library google-genai uses; we catch its timeout
 from google.genai import errors, types
 
 from app.dashboard.feed import get_feed          # Anish's feed: receipts + bank transactions merged
-from app.dashboard.summary import build_summary  # Anish's /summary math
+from app.dashboard.summary import build_summary, merchant_key, merchant_label  # Anish's /summary math
 from app.insights.subscriptions import get_subscriptions
 from app.models import Category
 from app.receipts.gemini import MODELS, RETRYABLE_CODES, _get_client  # Anish's tested models + client
@@ -38,12 +38,16 @@ def get_category_breakdown(start: str, end: str) -> list[dict]:
 
 def get_top_merchants(n: int, start: str, end: str) -> list[dict]:
     """The n merchants with the most spending: [{merchant, amount, count}]."""
-    totals = defaultdict(lambda: {"amount": 0.0, "count": 0})
+    # Group by Anish's merchant_key, so "Amazon" and "AMAZON MKTPLACE" count as one store,
+    # exactly like top_merchants in /summary.
+    totals = defaultdict(lambda: {"amount": 0.0, "count": 0, "names": []})
     for e in get_feed(start=start, end=end):
-        totals[e["merchant"]]["amount"] += e["amount"]
-        totals[e["merchant"]]["count"] += 1
-    ranked = sorted(totals.items(), key=lambda kv: kv[1]["amount"], reverse=True)[: int(n)]
-    return [{"merchant": m, "amount": round(v["amount"], 2), "count": v["count"]} for m, v in ranked]
+        group = totals[merchant_key(e["merchant"])]
+        group["amount"] += e["amount"]
+        group["count"] += 1
+        group["names"].append(e["merchant"])
+    ranked = sorted(totals.values(), key=lambda v: v["amount"], reverse=True)[: int(n)]
+    return [{"merchant": merchant_label(v["names"]), "amount": round(v["amount"], 2), "count": v["count"]} for v in ranked]
 
 
 def get_cash_vs_card(start: str, end: str) -> dict:

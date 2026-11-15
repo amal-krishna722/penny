@@ -1,5 +1,5 @@
 // The Penny logo: the back of an iPhone's camera module where one lens is a
-// copper penny ("snap a receipt, see every cent"), plus an optional "penny"
+// copper penny ("snap a receipt, see every cent"), plus an optional "Penny"
 // wordmark. Flat shapes only, so it stays crisp from a 16px favicon up to a
 // slide. Colors come from the tokens in app/globals.css. app/icon.svg and
 // public/brand/ are the same mark with the colors written out, because image
@@ -51,7 +51,7 @@ export default function Logo({ size = 32, showWordmark = true }: { size?: number
       <LogoMark size={size} />
       {showWordmark && (
         <span className="font-display font-semibold leading-none text-text" style={{ fontSize: size * 0.62 }}>
-          penny
+          Penny
         </span>
       )}
     </span>

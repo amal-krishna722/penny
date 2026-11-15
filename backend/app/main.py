@@ -10,8 +10,10 @@ from app.insights.router import router as insights_router    # Amal (Person B)
 
 app = FastAPI(title="Penny API")
 
-# CORS: lets the frontend (localhost:3000) call this API from the browser.
-app.add_middleware(CORSMiddleware, allow_origins=[FRONTEND_URL], allow_methods=["*"], allow_headers=["*"])
+# CORS: lets the frontend call this API from the browser. FRONTEND_URL can list several
+# origins, comma-separated, e.g. "http://localhost:3000,https://penny.vercel.app".
+ALLOWED_ORIGINS = [o.strip().rstrip("/") for o in FRONTEND_URL.split(",") if o.strip()]
+app.add_middleware(CORSMiddleware, allow_origins=ALLOWED_ORIGINS, allow_methods=["*"], allow_headers=["*"])
 
 app.include_router(receipts_router)
 app.include_router(dashboard_router)

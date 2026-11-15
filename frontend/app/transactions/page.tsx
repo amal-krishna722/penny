@@ -110,7 +110,7 @@ export default function TransactionsPage() {
           ))}
         </select>
 
-        <div className="inline-flex rounded-[10px] border border-border bg-surface-alt p-0.5 text-sm" role="group" aria-label="Filter by payment type">
+        <div className="reeded-md inline-flex bg-surface-alt p-0.5 text-sm" role="group" aria-label="Filter by payment type">
           {(["", "card", "cash"] as const).map((t) => (
             <button
               key={t}
@@ -201,7 +201,7 @@ function Skeleton() {
 
 function LoadError({ message }: { message: string }) {
   return (
-    <div role="alert" className="rounded-[14px] border border-danger/30 bg-danger/10 px-4 py-4 text-sm text-danger">
+    <div role="alert" className="reeded bg-danger/10 px-4 py-4 text-sm text-danger">
       <p className="font-semibold">Couldn&apos;t load transactions.</p>
       <p className="mt-1">{message}</p>
       <p className="mt-2">

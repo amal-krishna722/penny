@@ -1,5 +1,5 @@
 // Small shared display pieces used on several pages.
-import { Coin } from "@/components/Logo";
+import { LogoMark } from "@/components/Logo";
 import { money } from "@/lib/format";
 
 /**
@@ -17,11 +17,11 @@ export function Amount({ value, big = false, className = "" }: { value: number; 
   );
 }
 
-/** Friendly message with the coin logo faded behind it. */
+/** Friendly message with the logo faded behind it. */
 export function EmptyState({ title, children }: { title: string; children?: React.ReactNode }) {
   return (
     <div className="flex flex-col items-center px-4 py-10 text-center">
-      <Coin size={44} className="opacity-30" />
+      <LogoMark size={44} className="opacity-30" />
       <p className="mt-3 text-sm font-semibold text-text">{title}</p>
       {children && <p className="mt-1 max-w-sm text-sm text-text-muted">{children}</p>}
     </div>
@@ -30,9 +30,9 @@ export function EmptyState({ title, children }: { title: string; children?: Reac
 
 /** Banner for "sample data" notes and errors. */
 export function Notice({ tone, children }: { tone: "info" | "error"; children: React.ReactNode }) {
-  const styles = tone === "error" ? "border-danger/30 bg-danger/10 text-danger" : "border-border bg-accent-soft text-text";
+  const styles = tone === "error" ? "bg-danger/10 text-danger" : "bg-accent-soft text-text";
   return (
-    <p role={tone === "error" ? "alert" : undefined} className={`mb-6 rounded-[10px] border px-4 py-2.5 text-sm ${styles}`}>
+    <p role={tone === "error" ? "alert" : undefined} className={`reeded-md mb-6 px-4 py-2.5 text-sm ${styles}`}>
       {children}
     </p>
   );

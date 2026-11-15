@@ -8,7 +8,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Wrench } from "lucide-react";
-import { Coin } from "@/components/Logo";
+import { LogoMark } from "@/components/Logo";
 import PageHeader from "@/components/PageHeader";
 import { Notice } from "@/components/ui";
 import { ask, isMocked, SUGGESTED_QUESTIONS } from "@/lib/api";
@@ -75,7 +75,7 @@ export default function AskPage() {
         <div className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-6">
           {empty ? (
             <div className="flex flex-col items-center py-10 text-center">
-              <Coin size={44} className="opacity-30" />
+              <LogoMark size={44} className="opacity-30" />
               <p className="mt-3 text-sm font-semibold text-text">Ask anything about where your money went</p>
               <p className="mt-1 text-sm text-text-muted">
                 Answers come from your receipts and bank transactions, including cash.
@@ -107,7 +107,7 @@ export default function AskPage() {
                 key={q}
                 onClick={() => send(q)}
                 disabled={loading}
-                className="rounded-full border border-border bg-surface px-3 py-1 text-sm text-text hover:border-accent hover:bg-accent-soft disabled:opacity-50"
+                className="rounded-full bg-surface-alt px-3 py-1 text-sm text-text hover:bg-accent-soft disabled:opacity-50"
               >
                 {q}
               </button>
@@ -127,7 +127,7 @@ export default function AskPage() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="e.g. How much did I spend on dining last week?"
-            className="field min-w-0 flex-1"
+            className="min-w-0 flex-1 rounded-[10px] bg-surface-alt px-3 py-2 text-sm text-text placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-accent"
             aria-label="Your question"
           />
           <button
@@ -154,7 +154,7 @@ function Bubble({ message }: { message: Message }) {
 
   if (message.role === "error") {
     return (
-      <p role="alert" className="max-w-[80%] rounded-2xl border border-danger/30 bg-danger/10 px-4 py-2 text-sm text-danger">
+      <p role="alert" className="max-w-[80%] rounded-2xl bg-danger/10 px-4 py-2 text-sm text-danger">
         {message.text}
       </p>
     );
@@ -162,7 +162,7 @@ function Bubble({ message }: { message: Message }) {
 
   return (
     <div className="max-w-[80%]">
-      <p className="whitespace-pre-wrap rounded-2xl rounded-bl-sm border border-border bg-surface px-4 py-2 text-sm text-text">
+      <p className="whitespace-pre-wrap rounded-2xl rounded-bl-sm bg-surface-alt px-4 py-2 text-sm text-text">
         {message.text}
       </p>
       {message.tools.length > 0 && (

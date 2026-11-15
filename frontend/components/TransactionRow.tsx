@@ -61,7 +61,7 @@ export default function TransactionRow({
         <span className="hidden sm:block">
           <CategoryChip category={entry.category} />
         </span>
-        <span className="pill hidden border border-border text-text-muted sm:inline-flex">
+        <span className="pill hidden bg-surface-alt text-text-muted sm:inline-flex">
           {entry.type === "cash" ? "Cash" : "Card"}
         </span>
         <Amount value={entry.amount} className="w-24 text-right text-sm font-semibold text-text" />

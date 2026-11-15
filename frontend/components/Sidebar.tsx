@@ -20,9 +20,9 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex shrink-0 flex-col border-b border-border bg-surface px-4 py-4 md:sticky md:top-0 md:h-screen md:w-60 md:border-r md:border-b-0 md:py-7">
+    <nav className="flex shrink-0 flex-col reeded-b bg-surface px-4 py-4 md:sticky md:top-0 md:h-screen md:w-60 md:reeded-r md:py-7">
       <Link href="/" className="mb-3 block px-2 md:mb-1" aria-label="Penny home">
-        <Logo size={34} />
+        <Logo size={44} />
       </Link>
       {/* What P.E.N.N.Y. stands for: the first letter of each word in copper ink */}
       {/* Two fixed lines so "Yours" never wraps onto a line by itself */}

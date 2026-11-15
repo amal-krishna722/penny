@@ -29,6 +29,15 @@
   --accent-deep: #9c5f2e; /* coin rim in the logo */
   --accent-soft: #f3e1cf; /* copper tint for badges and highlights */
 
+  /* Reeded coin rim (the border on every box). Mirrored in the SVGs further down. */
+  --rim-lip: #7a4a27; /* darker lip at the rim's outer and inner edge */
+  --rim-shine: #e9b98f; /* bright highlight band */
+  --rim-ridge: #4a2e1a; /* ridge lines, drawn at 55% opacity */
+
+  /* Magnifying-glass logo only: the silver lens ring and handle collar */
+  --silver: #c9cdd2;
+  --silver-deep: #8e949b;
+
   /* Status */
   --success: #5f7f4e; /* matched receipt */
   --warning: #c9962e; /* card charge with no receipt */
@@ -80,6 +89,9 @@
   --color-accent: var(--accent);
   --color-accent-deep: var(--accent-deep);
   --color-accent-soft: var(--accent-soft);
+  --color-rim-lip: var(--rim-lip);
+  --color-rim-shine: var(--rim-shine);
+  --color-rim-ridge: var(--rim-ridge);
   --color-accent-ink: var(--accent-ink);
   --color-success: var(--success);
   --color-success-ink: var(--success-ink);
@@ -121,10 +133,94 @@
  * Reusable classes. @utility defines a class we can use like any Tailwind one.
  * ------------------------------------------------------------------------- */
 
+/*
+ * Reeded edge: the ridged side of a coin, used as the border of every box.
+ * Modeled on a photo of stacked coins: fine dark ridges (2px line, 4px gap)
+ * over a metallic sheen (dark lip, bright highlight, copper body, dark lip).
+ *
+ * How it works: the border itself is transparent and stacked SVG background
+ * layers paint the rim underneath it. Each layer is one rounded outline:
+ *   1. ridges   dashed --rim-ridge stroke; each dash is one ridge, so the
+ *               ridges follow the rounded corners evenly
+ *   2. outer lip, 3. shine, 4. inner lip   thin rings that shade the rim
+ *   5. body     solid copper (--accent) for the full rim width
+ * SVG images can't read CSS variables, so the colors are written out
+ * (%23 is "#"). Keep them in sync with the --rim-* tokens and --accent.
+ *
+ * The SVG corner radius (rx) must match the element's border-radius, so
+ * there are three sizes. Use exactly one per element:
+ *   reeded     cards and panels    14px corners, 8px rim
+ *   reeded-md  inputs, buttons     10px corners, 8px rim
+ *   reeded-sm  pills, chips         6px corners, 6px rim
+ * Inside each rim (outer edge first): 1/4 lip, 3/8 shine, 1/8 copper body,
+ * 1/4 lip. Ridges are 1/4 of the rim depth wide with a 1/2 gap.
+ * Only background-IMAGE is set, so Tailwind bg-* classes still color the inside.
+ */
+@utility reeded {
+  border: 8px solid transparent;
+  border-radius: 14px;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' rx='14' fill='none' stroke='%234A2E1A' stroke-width='16' stroke-opacity='.55' stroke-dasharray='2 4'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' rx='14' fill='none' stroke='%237A4A27' stroke-width='4'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' rx='12' fill='none' stroke='%23E9B98F' stroke-width='6'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' rx='8' fill='none' stroke='%237A4A27' stroke-width='4'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' rx='14' fill='none' stroke='%23B8733A' stroke-width='16'/%3E%3C/svg%3E");
+  background-size:
+    100% 100%,
+    100% 100%,
+    calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 12px) calc(100% - 12px),
+    100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-origin: border-box;
+}
+
+@utility reeded-md {
+  border: 8px solid transparent;
+  border-radius: 10px;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' rx='10' fill='none' stroke='%234A2E1A' stroke-width='16' stroke-opacity='.55' stroke-dasharray='2 4'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' rx='10' fill='none' stroke='%237A4A27' stroke-width='4'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' rx='8' fill='none' stroke='%23E9B98F' stroke-width='6'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' rx='4' fill='none' stroke='%237A4A27' stroke-width='4'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' rx='10' fill='none' stroke='%23B8733A' stroke-width='16'/%3E%3C/svg%3E");
+  background-size:
+    100% 100%,
+    100% 100%,
+    calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 12px) calc(100% - 12px),
+    100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-origin: border-box;
+}
+
+@utility reeded-sm {
+  --pill-radius: 6px;
+  border: 6px solid transparent;
+  border-radius: 6px;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' rx='6' fill='none' stroke='%234A2E1A' stroke-width='12' stroke-opacity='.55' stroke-dasharray='1.5 3'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' rx='6' fill='none' stroke='%237A4A27' stroke-width='3'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' rx='4.5' fill='none' stroke='%23E9B98F' stroke-width='4.5'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' rx='1.5' fill='none' stroke='%237A4A27' stroke-width='3'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Crect width='100%25' height='100%25' rx='6' fill='none' stroke='%23B8733A' stroke-width='12'/%3E%3C/svg%3E");
+  background-size:
+    100% 100%,
+    100% 100%,
+    calc(100% - 3px) calc(100% - 3px),
+    calc(100% - 9px) calc(100% - 9px),
+    100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-origin: border-box;
+}
+
 /* Cards and panels */
 @utility card {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  @apply reeded;
+  background-color: var(--surface);
   border-radius: var(--radius-card);
   box-shadow: 0 1px 2px rgb(59 42 32 / 0.06);
 }
@@ -162,16 +258,16 @@
   align-items: center;
   justify-content: center;
   gap: 0.375rem;
+  @apply reeded-md;
   border-radius: var(--radius-control);
-  border: 1px solid var(--border);
-  background: transparent;
+  background-color: transparent;
   color: var(--text);
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
   font-weight: 600;
   transition: background-color 150ms;
   &:hover:not(:disabled) {
-    background: var(--surface-alt);
+    background-color: var(--surface-alt);
   }
   &:disabled {
     opacity: 0.45;
@@ -180,9 +276,9 @@
 
 /* Text inputs and selects */
 @utility field {
+  @apply reeded-md;
   border-radius: var(--radius-control);
-  border: 1px solid var(--border);
-  background: var(--surface-alt);
+  background-color: var(--surface-alt);
   color: var(--text);
   padding: 0.5rem 0.75rem;
   font-size: 0.875rem;
@@ -200,7 +296,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  border-radius: 9999px;
+  border-radius: var(--pill-radius, 9999px);
   padding: 0.125rem 0.5rem;
   font-size: 0.6875rem;
   font-weight: 600;
@@ -241,4 +337,45 @@ h3 {
 :where(a, button, [role="button"], select):focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+/*
+ * One-sided reeded edges for the sidebar: along the bottom on phones (where
+ * it's a top bar) and along the right on desktop. Same rim as `reeded`, as
+ * straight CSS gradients since these edges have no corners:
+ * ridges on top, then the sheen across the rim's 8px depth.
+ */
+@utility reeded-b {
+  border-bottom: 8px solid transparent;
+  background-image:
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--rim-ridge) 55%, transparent) 0 2px, transparent 2px 6px),
+    linear-gradient(
+      180deg,
+      var(--rim-lip) 0 2px,
+      var(--accent) 2px 3px,
+      var(--rim-shine) 3px 6px,
+      var(--rim-lip) 6px 8px
+    );
+  background-position: bottom;
+  background-size: 100% 8px;
+  background-repeat: no-repeat;
+  background-origin: border-box;
+}
+
+@utility reeded-r {
+  border-bottom-width: 0;
+  border-right: 8px solid transparent;
+  background-image:
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--rim-ridge) 55%, transparent) 0 2px, transparent 2px 6px),
+    linear-gradient(
+      90deg,
+      var(--rim-lip) 0 2px,
+      var(--accent) 2px 3px,
+      var(--rim-shine) 3px 6px,
+      var(--rim-lip) 6px 8px
+    );
+  background-position: right;
+  background-size: 8px 100%;
+  background-repeat: no-repeat;
+  background-origin: border-box;
 }

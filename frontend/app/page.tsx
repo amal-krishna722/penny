@@ -6,7 +6,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Coin } from "@/components/Logo";
+import { LogoMark } from "@/components/Logo";
 import PageHeader from "@/components/PageHeader";
 import { CategoryDonut, CoverageRing, DailyBars, Sparkline } from "@/components/OverviewCharts";
 import { Amount, EmptyState, Notice } from "@/components/ui";
@@ -295,7 +295,7 @@ function Skeleton() {
     <div className="grid grid-cols-1 gap-8 xl:grid-cols-[minmax(0,1fr)_340px]" aria-busy="true">
       <div className="space-y-8">
         <div className="flex items-center gap-3">
-          <Coin size={28} className="animate-pulse opacity-40" />
+          <LogoMark size={28} className="animate-pulse opacity-40" />
           <div className="skeleton h-8 w-40" />
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">

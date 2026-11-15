@@ -6,7 +6,7 @@ export default function ShortcutQR() {
   return (
     <section className="card flex flex-col items-center gap-5 p-6 sm:flex-row sm:items-center">
       {/* White padding around the code: scanners need a light "quiet zone" */}
-      <div className="shrink-0 rounded-[10px] border border-border bg-white p-2">
+      <div className="shrink-0 rounded-[10px] bg-white p-2">
         <Image src="/shortcut-qr.png" alt="QR code to install the Penny iPhone Shortcut" width={140} height={140} />
       </div>
       <div className="text-center sm:text-left">

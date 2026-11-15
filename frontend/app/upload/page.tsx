@@ -5,7 +5,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { Coin } from "@/components/Logo";
+import { LogoMark } from "@/components/Logo";
 import PageHeader from "@/components/PageHeader";
 import ShortcutQR from "@/components/ShortcutQR";
 import { Amount, Notice } from "@/components/ui";
@@ -109,8 +109,8 @@ export default function UploadPage() {
           tabIndex={0}
           aria-label="Choose a receipt image"
           aria-disabled={busy}
-          className={`relative flex min-h-80 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-[14px] border-2 border-dashed p-6 text-center transition-colors ${
-            dragging ? "border-accent bg-accent-soft" : "border-border bg-surface hover:border-accent hover:bg-surface-alt"
+          className={`relative flex min-h-80 cursor-pointer flex-col items-center justify-center overflow-hidden reeded p-6 text-center transition-colors ${
+            dragging ? "bg-accent-soft" : "bg-surface hover:bg-surface-alt"
           } ${busy ? "cursor-wait" : ""}`}
         >
           <input
@@ -130,7 +130,7 @@ export default function UploadPage() {
             />
           ) : (
             <>
-              <Coin size={52} className="opacity-40" />
+              <LogoMark size={52} className="opacity-40" />
               <p className="mt-4 font-semibold text-text">Drop a receipt here</p>
               <p className="mt-1 text-sm text-text-muted">or click to choose a file, or paste a screenshot</p>
               <p className="mt-3 text-xs text-text-muted">JPEG or PNG</p>
@@ -138,9 +138,9 @@ export default function UploadPage() {
           )}
 
           {busy && (
-            // A pulsing coin instead of a spinner
+            // A pulsing logo instead of a spinner
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-surface/70">
-              <Coin size={44} className="animate-pulse" />
+              <LogoMark size={44} className="animate-pulse" />
               <p className="text-sm font-semibold text-text">Reading receipt with Gemini…</p>
             </div>
           )}
@@ -162,7 +162,7 @@ export default function UploadPage() {
           {status.kind === "uploading" && <ResultSkeleton />}
 
           {status.kind === "error" && (
-            <div role="alert" className="rounded-[14px] border border-danger/30 bg-danger/10 p-5 text-sm text-danger">
+            <div role="alert" className="reeded bg-danger/10 p-5 text-sm text-danger">
               <p className="font-semibold">Upload failed</p>
               <p className="mt-1">{status.message}</p>
               <button
@@ -204,7 +204,7 @@ function ResultCard({ result, onReset }: { result: ReceiptResponse; onReset: () 
       {isMocked("receipt") && (
         <Notice tone="info">Sample data: the backend isn&apos;t connected yet, so this isn&apos;t your receipt.</Notice>
       )}
-      <div className="rounded-[14px] border border-success/30 bg-success/10 px-5 py-4 text-text">
+      <div className="reeded bg-success/10 px-5 py-4 text-text">
         <p className="text-xs font-semibold uppercase tracking-wide text-success-ink">Itemized</p>
         <p className="mt-1 font-medium">{result.summary}</p>
       </div>
@@ -218,7 +218,7 @@ function ResultCard({ result, onReset }: { result: ReceiptResponse; onReset: () 
           <div className="flex flex-col items-end gap-1.5">
             <CategoryChip category={r.category} />
             {r.is_cash ? (
-              <span className="pill border border-border text-text-muted">Cash</span>
+              <span className="pill bg-surface-alt text-text-muted">Cash</span>
             ) : (
               <span className="pill bg-success/15 text-success-ink">
                 Matched to card

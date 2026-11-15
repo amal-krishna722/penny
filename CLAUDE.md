@@ -1,9 +1,9 @@
-# CLAUDE.md: Itemize (HackUMass XIV)
+# CLAUDE.md: Penny (HackUMass XIV)
 
 ## What we're building
-**Itemize: see where it went.** An AI financial ledger that tells users what they actually bought, not just what their bank charged.
+**Penny: see where it went.** An AI financial ledger that tells users what they actually bought, not just what their bank charged.
 
-A bank app shows `AMAZON $84.12`. Itemize shows $60 of groceries and a $24 phone case, and it also counts cash purchases banks never see.
+A bank app shows `AMAZON $84.12`. Penny shows $60 of groceries and a $24 phone case, and it also counts cash purchases banks never see.
 
 ### Core flow
 1. User double-taps the back of their iPhone (Back Tap runs an Apple Shortcut, no native app).

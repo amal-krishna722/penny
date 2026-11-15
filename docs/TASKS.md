@@ -1,4 +1,4 @@
-# Itemize: TASKS
+# Penny: TASKS
 
 Who builds what, in what order. Each task says which files to touch, how to test it and when it counts as done. Work top to bottom. Check a box when the task is merged into `main`.
 
@@ -192,12 +192,12 @@ You own `backend/app/bank/`, `backend/app/insights/`, `backend/scripts/`, `backe
 - **Done when:** all 4 demo receipts match (or don't) as the table in B2 says.
 
 ### B5. Subscriptions (target 5:00 PM)
-- [ ] **Files:** `backend/app/insights/subscriptions.py`, `backend/app/insights/router.py`
+- [x] **Files:** `backend/app/insights/subscriptions.py`, `backend/app/insights/router.py`
 - **Build:** group transactions by normalized merchant, sort by date. A pair is recurring when amounts are within 5% and 26 to 35 days apart. 2+ recurring charges = subscription. `next_expected` = last + 30 days. Set `is_subscription=True` on those transactions. Endpoint `GET /subscriptions`.
 - **Done when:** exactly the 4 seeded subscriptions come back.
 
 ### B6. Ask AI (target 7:00 PM)
-- [ ] **Files:** `backend/app/insights/ask.py`, `backend/app/insights/router.py`
+- [x] **Files:** `backend/app/insights/ask.py`, `backend/app/insights/router.py`
 - **Build:** `POST /ask` with Gemini **function calling**. Each tool is a Python function that queries MongoDB and returns JSON:
 
   | Tool | Arguments | Returns |

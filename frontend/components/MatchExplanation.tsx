@@ -55,7 +55,11 @@ function CardMatch({ entry, receipt }: { entry: FeedEntry; receipt: Receipt }) {
         </dd>
         <dd className="text-right font-semibold tabular-nums">{money(receipt.total)}</dd>
         <dt className="text-text-muted">Bank</dt>
-        <dd>Card charge · {shortDate(entry.date)}</dd>
+        {/* The bank's raw name next to the receipt's clean one shows why name matching is needed */}
+        <dd>
+          {entry.bank_merchant ? <span className="font-mono text-[11px]">{entry.bank_merchant}</span> : "Card charge"} ·{" "}
+          {shortDate(entry.date)}
+        </dd>
         <dd className="text-right font-semibold tabular-nums">{money(entry.amount)}</dd>
       </dl>
 
@@ -65,7 +69,14 @@ function CardMatch({ entry, receipt }: { entry: FeedEntry; receipt: Receipt }) {
           {dateText} Allowed: within {MATCH_RULES.maxDaysApart} days.
         </Rule>
         <Rule label="Store">
-          Names are at least {MATCH_RULES.minNameSimilarityPct}% similar once store numbers and city names are removed.
+          {entry.bank_merchant ? (
+            <>
+              “{receipt.merchant}” ↔ “{entry.bank_merchant}”: the same store once store numbers and city names are
+              removed (at least {MATCH_RULES.minNameSimilarityPct}% similar required).
+            </>
+          ) : (
+            <>Names are at least {MATCH_RULES.minNameSimilarityPct}% similar once store numbers and city names are removed.</>
+          )}
         </Rule>
       </ul>
 

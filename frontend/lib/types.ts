@@ -60,6 +60,8 @@ export interface FeedEntry {
   receipt_id: string | null;
   transaction_id: string | null;
   is_subscription: boolean;
+  /** The bank's own name on card rows ("CHIPOTLE 2741 AMHERST"); null for cash. Optional in SPEC. */
+  bank_merchant?: string | null;
 }
 
 // ---------- SPEC section 4: request and response bodies ----------

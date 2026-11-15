@@ -28,7 +28,7 @@ const MOCK = {
   summary: false, // GET /summary        (Person A, A6) live
   account: false, // GET /bank/account   (Person B, B3) live
   subscriptions: false, // GET /subscriptions  (Person B, B5) live
-  ask: true, // POST /ask           (Person B, B6) not built yet
+  ask: false, // POST /ask           (Person B, B6) live
   receipt: false, // POST /receipt       (Person A, A2) live
 };
 
@@ -131,8 +131,14 @@ export function getSubscriptions(): Promise<SubscriptionsResponse> {
   return request("/subscriptions");
 }
 
-/** The suggested questions on the Ask AI page (they have canned mock answers). */
-export const SUGGESTED_QUESTIONS: string[] = mockAsk.map((m) => m.question);
+/** The suggested question buttons on the Ask AI page. */
+export const SUGGESTED_QUESTIONS: string[] = [
+  "How much did I spend on food this month?",
+  "Where did most of my money go?",
+  "How much cash did I spend?",
+  "How much do I pay for subscriptions?",
+  "When did I last buy coffee?",
+];
 
 /** POST /ask */
 export function ask(question: string): Promise<AskResponse> {

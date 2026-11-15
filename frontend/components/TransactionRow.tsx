@@ -41,12 +41,15 @@ export default function TransactionRow({
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <span className="truncate font-semibold text-text">{entry.merchant}</span>
-            {hasReceipt && (
-              <ReceiptText
-                size={15}
-                className="shrink-0 text-success"
-                aria-label={entry.type === "card" ? "Matched receipt" : "Receipt"}
-              />
+            {/* "Itemized": a card charge we matched to a scanned receipt */}
+            {hasReceipt && entry.type === "card" && (
+              <span className="pill gap-1 bg-success/15 text-success-ink">
+                <ReceiptText size={13} aria-hidden="true" />
+                Itemized
+              </span>
+            )}
+            {hasReceipt && entry.type === "cash" && (
+              <ReceiptText size={15} className="shrink-0 text-success" aria-label="Receipt" />
             )}
             {entry.is_subscription && <span className="pill bg-accent-soft text-accent-ink">Subscription</span>}
           </div>

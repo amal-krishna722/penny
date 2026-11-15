@@ -42,7 +42,11 @@ export default function AskPage() {
       setMessages((m) => [...m, { role: "assistant", text: res.answer, tools: res.tools_used }]);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      setMessages((m) => [...m, { role: "error", text: `Couldn't get an answer (${msg}). Check that the backend is running.` }]);
+      // 502 means Gemini was busy or failed: a retry usually works.
+      const text = msg.startsWith("502")
+        ? "Gemini is busy right now. Wait a few seconds and try again."
+        : `Couldn't get an answer (${msg}). Check that the backend is running.`;
+      setMessages((m) => [...m, { role: "error", text }]);
     } finally {
       setLoading(false);
     }

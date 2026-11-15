@@ -225,36 +225,36 @@ You own `backend/app/bank/`, `backend/app/insights/`, `backend/scripts/`, `backe
 You own `frontend/`. Build everything against **mock data first** (copied from SPEC section 3 and 4), then switch to the real API when each endpoint is ready.
 
 ### C1. Setup (target 11:45 AM)
-- [ ] From the repo root: `npx create-next-app@latest frontend` (TypeScript yes, ESLint yes, Tailwind yes, `src/` no, App Router yes, default alias). Delete `frontend/.git` if it exists.
-- [ ] `npm install recharts`
-- [ ] `frontend/.env.local` with `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_API_SECRET`
-- [ ] `frontend/lib/api.ts`: one function per endpoint. A `USE_MOCKS` flag at the top returns data from `frontend/mocks/*.json` instead of calling the API.
-- [ ] Layout with a sidebar: Overview, Transactions, Insights, Ask AI, Upload.
+- [x] From the repo root: `npx create-next-app@latest frontend` (TypeScript yes, ESLint yes, Tailwind yes, `src/` no, App Router yes, default alias). Delete `frontend/.git` if it exists.
+- [x] `npm install recharts`
+- [x] `frontend/.env.local` with `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_API_SECRET`
+- [x] `frontend/lib/api.ts`: one function per endpoint. A `USE_MOCKS` flag at the top returns data from `frontend/mocks/*.json` instead of calling the API.
+- [x] Layout with a sidebar: Overview, Transactions, Insights, Ask AI, Upload.
 - **Done when:** all 5 pages exist (empty) and the nav works.
 
 ### C2. Transactions page (target 2:00 PM)
-- [ ] **Uses:** `GET /transactions`
+- [x] **Uses:** `GET /transactions`
 - List of FeedEntry rows: merchant, date, amount, category. Click a row to expand its line items. Badges: **Cash**, **Itemized** (has a receipt), **Subscription**. Filters for category and card/cash.
 - Poll every 3 seconds so a double tap shows up live.
 - **Done when:** it works on real data at the 2 PM integration.
 
 ### C3. Upload page (target 2:30 PM)
-- [ ] **Uses:** `POST /receipt?source=web_upload`
+- [x] **Uses:** `POST /receipt?source=web_upload`
 - Drag-and-drop area, sends the file with the `X-API-Key` header, shows the returned `summary`. This is the backup if the Shortcut fails on stage.
 
 ### C4. Overview page (target 4:30 PM)
-- [ ] **Uses:** `GET /summary`, `GET /bank/account`
+- [x] **Uses:** `GET /summary`, `GET /bank/account`
 - Stat cards: total spent, balance, cash vs card, receipt coverage %. Line chart of `daily`. Donut chart of `by_category`. Top merchants list.
 
 ### C5. Insights page (target 5:30 PM)
-- [ ] **Uses:** `GET /subscriptions`
+- [x] **Uses:** `GET /subscriptions`
 - Subscription cards with the monthly total at the top. Add more sections only if the backend adds endpoints.
 
 ### C6. Ask AI page (target 7:00 PM)
-- [ ] **Uses:** `POST /ask`
+- [x] **Uses:** `POST /ask`
 - Chat box, 4 or 5 suggested questions as buttons, answers with `tools_used` shown as small chips underneath.
 
 ### C7. After freeze
-- [ ] Turn off mocks everywhere, polish spacing and colors, empty and loading states.
+- [x] Turn off mocks everywhere, polish spacing and colors, empty and loading states.
 - [ ] Optional: deploy to Vercel and add the Vercel URL to the backend's `FRONTEND_URL`.
 - [ ] Take screenshots for Devpost.

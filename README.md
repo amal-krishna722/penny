@@ -49,3 +49,7 @@ npm run dev
 ```
 
 Then open http://localhost:3000. The API contract between the backend and frontend is in [docs/SPEC.md](docs/SPEC.md).
+
+## Deployment
+
+The backend runs on a Vultr server behind Caddy for HTTPS: https://45-77-216-120.sslip.io/docs. How it's set up and updated is in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).

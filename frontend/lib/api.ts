@@ -138,7 +138,7 @@ export const SUGGESTED_QUESTIONS: string[] = [
   "Where did most of my money go?",
   "How much cash did I spend?",
   "How much do I pay for subscriptions?",
-  "When did I last buy coffee?",
+  "How much did I spend on shopping this month?",
 ];
 
 /** POST /ask */

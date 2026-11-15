@@ -8,7 +8,7 @@ import httpx2  # the HTTP library google-genai uses; we catch its timeout
 from google.genai import errors, types
 
 from app.dashboard.feed import get_feed          # Anish's feed: receipts + bank transactions merged
-from app.dashboard.summary import build_summary, merchant_key, merchant_label  # Anish's /summary math
+from app.dashboard.summary import build_summary, category_split, merchant_key, merchant_label  # Anish's /summary math
 from app.insights.subscriptions import get_subscriptions
 from app.models import Category
 from app.receipts.gemini import MODELS, RETRYABLE_CODES, _get_client  # Anish's tested models + client
@@ -26,9 +26,17 @@ def get_spending(start: str, end: str, categories: list[str] | None = None, type
     """Total spent and number of purchases. Optional: only some categories, and/or only "card" or "cash".
     Takes a list so "food" (groceries + dining) is summed here in Python, not by Gemini."""
     feed = get_feed(start=start, end=end, type=type)
-    if categories:
-        feed = [e for e in feed if e["category"] in categories]
-    return {"total": round(sum(e["amount"] for e in feed), 2), "count": len(feed)}
+    if not categories:
+        return {"total": round(sum(e["amount"] for e in feed), 2), "count": len(feed)}
+    # Itemized purchases count per line item (same split as /summary), so a phone case
+    # bought with groceries counts as shopping, not food.
+    total, count = 0.0, 0
+    for e in feed:
+        part = sum(amount for category, amount in category_split(e).items() if category in categories)
+        if part > 0:
+            total += part
+            count += 1
+    return {"total": round(total, 2), "count": count}
 
 
 def get_category_breakdown(start: str, end: str) -> list[dict]:

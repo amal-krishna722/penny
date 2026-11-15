@@ -32,6 +32,21 @@ def merchant_label(names: list[str]) -> str:
     return " ".join(words).title() or best
 
 
+def category_split(entry: dict) -> dict[str, float]:
+    """How much of one purchase went to each category.
+    Itemized purchases are split by their line items, with tax and tip spread in proportion
+    (Amazon $84.12 -> groceries $61.14 + shopping $22.98). Purchases without items count
+    fully in their own category. Used by /summary and by Ask AI, so they always agree."""
+    items = [i for i in entry.get("items") or [] if (i.get("price") or 0) > 0]
+    items_total = sum(i["price"] for i in items)
+    if not items_total:
+        return {entry["category"]: entry["amount"]}
+    split = defaultdict(float)
+    for i in items:
+        split[i.get("category") or entry["category"]] += entry["amount"] * i["price"] / items_total
+    return dict(split)
+
+
 def _pct(part: float, whole: float) -> float:
     return round(part / whole * 100, 1) if whole else 0.0
 
@@ -48,7 +63,8 @@ def build_summary(feed: list[dict], start: str, end: str) -> dict:
     by_day = defaultdict(float)
     by_merchant = defaultdict(lambda: {"amount": 0.0, "count": 0, "names": []})
     for e in feed:
-        by_cat[e["category"]] += e["amount"]
+        for category, amount in category_split(e).items():  # itemized receipts split by line item
+            by_cat[category] += amount
         by_day[e["date"]] += e["amount"]
         # Group by the bank name when there is one: "Chipotle Mexican Grill" (receipt) and
         # "CHIPOTLE 2741 AMHERST" (bank) clean to different keys, but every Chipotle charge

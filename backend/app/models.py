@@ -64,6 +64,7 @@ class FeedEntry(BaseModel):
     receipt_id: str | None = None
     transaction_id: str | None = None
     is_subscription: bool = False
+    bank_merchant: str | None = None  # the bank's own name on card rows ("CHIPOTLE 2741 AMHERST"); None for cash
 
 
 # ---------- SPEC section 4: request and response bodies ----------

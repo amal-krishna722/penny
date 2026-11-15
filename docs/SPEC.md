@@ -164,9 +164,12 @@ Rules for all data:
   "items": [ LineItem ],
   "receipt_id": "673a1f0c2e",
   "transaction_id": "673a2aa91b",
-  "is_subscription": false
+  "is_subscription": false,
+  "bank_merchant": "CHIPOTLE 2741 AMHERST"
 }
 ```
+- `bank_merchant` (optional): the bank's own name on card rows, so the UI can show "CHIPOTLE 2741 AMHERST ↔ Chipotle Mexican Grill". `null` for cash rows.
+
 How to build the feed:
 | Situation | `type` | `amount` from | `items` | `receipt_id` | `transaction_id` |
 |---|---|---|---|---|---|
@@ -230,6 +233,7 @@ Query (optional): `start`, `end`. Default: last 30 days.
 }
 ```
 - `receipt_coverage_pct` = percent of card spending that has a matched receipt.
+- `by_category` splits itemized purchases by line item, with tax and tip spread in proportion (the Amazon $84.12 counts as groceries $61.14 + shopping $22.98). Purchases without items count fully in their own category.
 - `daily` has one entry for every day in the range, with `0` for days without spending.
 
 ### POST /demo/reset

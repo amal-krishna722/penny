@@ -27,8 +27,8 @@ def build_feed(receipt_docs: list[dict], transaction_docs: list[dict]) -> list[d
             "receipt_id": r["id"] if r else None,
             "transaction_id": t["id"],
             "is_subscription": t.get("is_subscription", False),
-            # Internal only (not in FeedEntry, so /transactions drops it): the bank's name,
-            # which groups the same store even when the receipt name cleans differently.
+            # The bank's own name. Shown next to the receipt name in the frontend's match panel,
+            # and used to group the same store even when the receipt name cleans differently.
             "bank_merchant": t["merchant"],
         })
 

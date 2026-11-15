@@ -50,7 +50,10 @@ def build_summary(feed: list[dict], start: str, end: str) -> dict:
     for e in feed:
         by_cat[e["category"]] += e["amount"]
         by_day[e["date"]] += e["amount"]
-        group = by_merchant[merchant_key(e["merchant"])]
+        # Group by the bank name when there is one: "Chipotle Mexican Grill" (receipt) and
+        # "CHIPOTLE 2741 AMHERST" (bank) clean to different keys, but every Chipotle charge
+        # has the same bank name. The receipt name still goes into names, so it's the label.
+        group = by_merchant[merchant_key(e.get("bank_merchant") or e["merchant"])]
         group["amount"] += e["amount"]
         group["count"] += 1
         group["names"].append(e["merchant"])

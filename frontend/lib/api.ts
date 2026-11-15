@@ -25,9 +25,9 @@ import mockReceipt from "@/mocks/receipt.json";
 // ---------------------------------------------------------------------------
 const MOCK = {
   transactions: false, // GET /transactions   (Person A, A4) live
-  summary: true, // GET /summary        (Person A, A6) not built yet
+  summary: false, // GET /summary        (Person A, A6) live
   account: false, // GET /bank/account   (Person B, B3) live
-  subscriptions: true, // GET /subscriptions  (Person B, B5) not built yet
+  subscriptions: false, // GET /subscriptions  (Person B, B5) live
   ask: true, // POST /ask           (Person B, B6) not built yet
   receipt: false, // POST /receipt       (Person A, A2) live
 };
